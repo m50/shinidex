@@ -1,0 +1,14 @@
+package views
+
+import "fmt"
+
+templ Home() {
+    <main class="bg-slate-800 text-slate-100 w-screen h-screen flex flex-col justify-center items-center">
+        <span>Hello world</span>
+        <button class="bg-indigo-500 p-3 rounded-xl hover:bg-indigo-700" hx-get="/click" hx-target="previous">Click me</button>
+    </main>
+}
+
+templ Click(click int) {
+    I was clicked { fmt.Sprint(click) } times!!!
+}
