@@ -4,7 +4,10 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"fmt"
+	"math/rand"
 	"os"
+	"strconv"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/tursodatabase/go-libsql"
@@ -46,4 +49,24 @@ func New() (*Database, error) {
 
 func (db *Database) Close() {
 	db.conn.Close()
+}
+
+func generateId() string {
+	now := time.Now().UnixMicro()
+	timeComponent := strconv.FormatInt(now, 36)
+	timeComponent = timeComponent[2:]
+
+	randComponent := "";
+	for i := 0; i < 5; i++ {
+		r := rand.Uint64()
+		randComponent += strconv.FormatUint(r, 36)
+	}
+
+	max := len(randComponent) - (32 - len(timeComponent))
+	start := rand.Intn(max)
+	randComponent = randComponent[start:]
+
+	id := timeComponent + randComponent
+	id = id[:32]
+	return id
 }
