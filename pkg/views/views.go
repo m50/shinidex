@@ -5,14 +5,13 @@ import (
 
 	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
-	"github.com/m50/shinidex/frontend/views/layout"
 )
 
 
 func RenderView(ctx echo.Context, status int, t templ.Component) error {
     ctx.Response().Writer.WriteHeader(status)
 	if ctx.Request().Header.Get("hx-request") != "true" {
-		base := layout.Base()
+		base := BaseLayout()
 		children := templ.WithChildren(ctx.Request().Context(), t)
 		return base.Render(children, ctx.Response().Writer)
 	}

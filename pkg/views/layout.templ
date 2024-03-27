@@ -1,0 +1,26 @@
+package views
+
+templ BaseLayout() {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<link rel="stylesheet" href="/assets/style.css"/>
+			<script src="/assets/scripts.js"></script>
+			<title>Shinidex</title>
+		</head>
+		<body class="min-h-screen w-screen flex flex-col">
+			<div class="w-screen flex bg-indigo-500 text-slate-200 h-16 text-3xl justify-center items-center">
+				<div class="flex flex-col px-4 lg:px-0 w-full lg:w-2/3">
+				<span>Shinidex</span>
+				</div>
+			</div>
+			<main class="flex-1 bg-slate-800 text-slate-200 w-screen h-full flex justify-center">
+				<div class="flex flex-col px-4 lg:px-0 w-full lg:w-2/3">
+				{ children... }
+				</div>
+			</main>
+		</body>
+	</html>
+}
