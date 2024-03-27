@@ -2,3 +2,6 @@
 assets/
 node_modules/
 tmp/
+*.db
+.env*
+.vscode/

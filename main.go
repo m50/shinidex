@@ -1,29 +1,33 @@
 package main
 
 import (
-	"net/http"
+	"log"
+	"os"
 
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-	"github.com/m50/shinidex/frontend/views"
+	"github.com/joho/godotenv"
+	"github.com/m50/shinidex/pkg/database"
+	"github.com/m50/shinidex/pkg/web"
 )
 
 func main() {
-	e := echo.New()
-	e.HideBanner = true
+	if _, err := os.Stat("./.env"); err == nil {
+		if err = godotenv.Load("./.env"); err != nil {
+			log.Fatalf("error loading .env file: %s", err)
+		}
+	}
 
-	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-		Format: "${time_rfc3339} \x1b[34mRQST\x1b[0m ${method} http://${host}${uri} : ${status} ${error}\n",
-	}))
+	db, err := database.New()
+	if err != nil {
+		log.Fatalf("DB failed to open: %s", err)
+		return
+	}
+	defer db.Close()
+	if err = db.Migrate(); err != nil {
+		log.Fatalf("Failed to migrate: %s", err)
+		return
+	}
 
-	e.Static("/assets", "assets")
-	e.GET("/", func(c echo.Context) error {
-		return views.RenderView(c, http.StatusOK, views.Home())
-	})
-	clicked := 0
-	e.GET("/click", func(c echo.Context) error {
-		clicked++
-		return views.RenderView(c, http.StatusOK, views.Click(clicked))
-	})
-	e.Logger.Fatal(e.Start(":1323"))
+	e := web.New()
+	e.Logger.Info("test")
+	// e.Logger.Fatal(e.Start(":1323"))
 }
