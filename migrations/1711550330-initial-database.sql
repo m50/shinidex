@@ -30,7 +30,7 @@ CREATE TABLE pokedexes (
 	FOREIGN KEY(owner_id) REFERENCES users(id)
 );
 
-CREATE TABLE pokedex_entry (
+CREATE TABLE pokedex_entries (
 	pokedex_id TEXT NOT NULL,
 	pokemon_id TEXT NOT NULL,
 	form_id TEXT,
