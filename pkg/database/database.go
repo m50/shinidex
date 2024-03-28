@@ -17,14 +17,21 @@ type Database struct {
 	conn *sqlx.DB
 }
 
-func New() (*Database, error) {
+func NewFromEnv() (*Database, error) {
 	file := os.Getenv("DB_PATH")
 	if file == "" {
 		return nil, fmt.Errorf("DB_PATH envvar needs to be set")
 	}
 	dbUrl := os.Getenv("TURSO_URL")
 	authToken := os.Getenv("TURSO_AUTH_TOKEN")
+	return New(file, dbUrl, authToken)
+}
 
+func NewLocal(file string) (*Database, error) {
+	return New(file, "", "")
+}
+
+func New(file, dbUrl, authToken string) (*Database, error) {
 	var db *sqlx.DB
 	var err error
 	if dbUrl != "" && authToken != "" {

@@ -12,8 +12,9 @@ CREATE TABLE migrations (
 );
 `
 
-func (db *Database) Migrate() error {
-	files, err := os.ReadDir("./migrations")
+func (db *Database) Migrate(path string) error {
+	path = strings.TrimRight(path, "/")
+	files, err := os.ReadDir(path)
 	if err != nil {
 		return err
 	}
@@ -30,31 +31,29 @@ func (db *Database) Migrate() error {
 	tx := db.conn.MustBegin()
 	for _, f := range files {
 		fmt.Println("Migrating " + f.Name())
-		res := &struct {
-			C int `db:"c"`
-		}{}
-		if err := db.conn.Get(res, "SELECT count(*) as c FROM migrations WHERE id = $1;", f.Name()); err != nil {
+		var res int
+		if err := tx.Get(&res, "SELECT count(*) FROM migrations WHERE id = $1;", f.Name()); err != nil {
 			tx.Rollback()
 			return err
 		}
-		if res.C == 1 {
+		if res == 1 {
 			continue
 		}
 
-		sql, err := os.ReadFile("./migrations/" + f.Name())
+		sql, err := os.ReadFile(path + "/" + f.Name())
 		if err != nil {
 			tx.Rollback()
 			return err
 		}
 		queries := strings.Split(string(sql), ";")
 		for _, q := range queries {
-			_, err = db.conn.Exec(q + ";")
+			_, err = tx.Exec(q + ";")
 			if err != nil {
 				tx.Rollback()
 				return err
 			}
 		}
-		_, err = db.conn.Exec("INSERT INTO migrations (id) VALUES ($1);", f.Name())
+		_, err = tx.Exec("INSERT INTO migrations (id) VALUES ($1);", f.Name())
 		if err != nil {
 			tx.Rollback()
 			return err

@@ -4,38 +4,39 @@ CREATE TABLE users (
 	id TEXT PRIMARY KEY,
 	email TEXT NOT NULL,
 	password TEXT NOT NULL,
-	created INTEGER NOT NULL,
-	updated INTEGER NOT NULL
+	created DATETIME NOT NULL,
+	updated DATETIME NOT NULL
 );
 
 CREATE TABLE pokemon (
 	id TEXT PRIMARY KEY,
-	name TEXT
+	name TEXT NOT NULL
 );
 
 CREATE TABLE pokemon_forms (
-	id TEXT,
-	pokemon_id TEXT,
+	id TEXT NOT NULL,
+	pokemon_id TEXT NOT NULL,
+	name TEXT NOT NULL,
 	FOREIGN KEY(pokemon_id) REFERENCES pokemon(id),
 	CONSTRAINT pokemon_form_id_cstrt PRIMARY KEY (id, pokemon_id)
 );
 
-CREATE TABLE dex (
+CREATE TABLE pokedexes (
 	id TEXT PRIMARY KEY,
 	owner_id TEXT NOT NULL,
 	config TEXT NOT NULL,
-	created INTEGER NOT NULL,
-	updated INTEGER NOT NULL,
+	created DATETIME NOT NULL,
+	updated DATETIME NOT NULL,
 	FOREIGN KEY(owner_id) REFERENCES users(id)
 );
 
 CREATE TABLE pokedex_entry (
-	dex_id TEXT NOT NULL,
+	pokedex_id TEXT NOT NULL,
 	pokemon_id TEXT NOT NULL,
 	form_id TEXT,
-	created INTEGER NOT NULL,
-	updated INTEGER NOT NULL,
-	FOREIGN KEY(dex_id) REFERENCES dex(id) ON DELETE CASCADE,
+	created DATETIME NOT NULL,
+	updated DATETIME NOT NULL,
+	FOREIGN KEY(pokedex_id) REFERENCES pokedexes(id) ON DELETE CASCADE,
 	FOREIGN KEY(pokemon_id) REFERENCES pokemon(id)
-	CONSTRAINT pokemon_entry_id_cstrt PRIMARY KEY (dex_id, pokemon_id)
+	CONSTRAINT pokemon_entry_id_cstrt PRIMARY KEY (pokedex_id, pokemon_id)
 );

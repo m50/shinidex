@@ -16,13 +16,13 @@ func main() {
 		}
 	}
 
-	db, err := database.New()
+	db, err := database.NewFromEnv()
 	if err != nil {
 		log.Fatalf("DB failed to open: %s", err)
 		return
 	}
 	defer db.Close()
-	if err = db.Migrate(); err != nil {
+	if err = db.Migrate("./migrations"); err != nil {
 		log.Fatalf("Failed to migrate: %s", err)
 		return
 	}
