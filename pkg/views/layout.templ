@@ -11,16 +11,29 @@ templ BaseLayout() {
 			<title>Shinidex</title>
 		</head>
 		<body class="min-h-screen flex flex-col">
-			<div class="w-full flex bg-indigo-500 text-slate-200 h-16 text-3xl justify-center items-center">
-				<div class="flex flex-col px-4 lg:px-0">
-					<span>Shinidex</span>
-				</div>
-			</div>
-			<main class="flex-1 bg-slate-800 text-slate-200 w-full h-full flex justify-center">
+			@Header()
+			<main class="pt-8 flex-1 bg-slate-800 text-slate-200 w-full h-full flex justify-center">
 				<div class="flex flex-col px-4 lg:px-0 w-full">
 					{ children... }
 				</div>
 			</main>
 		</body>
 	</html>
+}
+
+templ Header() {
+	<header class="px-4 w-full flex gap-4 bg-indigo-500 text-slate-200 h-16 text-3xl justify-center items-center">
+		<span class="flex-none">Shinidex</span>
+		<span class="grow">&nbsp;</span>
+		<div class="text-xl">
+			<a href="/pokemon/" class="hover:text-slate-400 flex-none">Pokémon</a>
+			<a class="hover:text-slate-400 flex-none">Pokédexes</a>
+			<a class="hover:text-slate-400 flex-none">Account</a>
+		</div>
+	</header>
+}
+
+// OOB Swap into a notification feed
+templ Error(err error) {
+	<div></div>
 }

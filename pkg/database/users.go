@@ -27,12 +27,6 @@ func (db UserDB) FindByEmail(email string) (types.User, error) {
 	return user, err
 }
 
-func (db UserDB) FindByUsername(username string) (types.User, error) {
-	user := types.User{}
-	err := db.conn.Get(&user, "SELECT * FROM users WHERE username = $1", username)
-	return user, err
-}
-
 func (db UserDB) Insert(user types.User) error {
 	query := `
 	INSERT INTO users (id, email, password, created, updated)

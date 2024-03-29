@@ -50,6 +50,9 @@ func New(db *database.Database) *echo.Echo {
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Format: "${time_rfc3339} \x1b[34mRQST\x1b[0m ${method} http://${host}${uri} : ${status} ${error}\n",
 	}))
+	e.Use(middleware.Gzip())
+	e.Use(middleware.Secure())
+	e.Use(middleware.Recover())
 
 	router(e)
 
