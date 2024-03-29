@@ -10,13 +10,16 @@ CREATE TABLE users (
 
 CREATE TABLE pokemon (
 	id TEXT PRIMARY KEY,
-	name TEXT NOT NULL
+	national_dex_number INTEGER NOT NULL,
+	name TEXT NOT NULL,
+	shiny_locked INTEGER(1) NOT NULL
 );
 
 CREATE TABLE pokemon_forms (
 	id TEXT NOT NULL,
 	pokemon_id TEXT NOT NULL,
 	name TEXT NOT NULL,
+	shiny_locked INTEGER(1) NOT NULL,
 	FOREIGN KEY(pokemon_id) REFERENCES pokemon(id),
 	CONSTRAINT pokemon_form_id_cstrt PRIMARY KEY (id, pokemon_id)
 );

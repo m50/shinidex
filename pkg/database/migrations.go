@@ -47,10 +47,24 @@ func (db *Database) Migrate(path string) error {
 		}
 		queries := strings.Split(string(sql), ";")
 		for _, q := range queries {
-			_, err = tx.Exec(q + ";")
+			if strings.TrimSpace(q) == "" {
+				continue
+			}
+			r, err := tx.Exec(q)
 			if err != nil {
 				tx.Rollback()
 				return err
+			}
+			if strings.ToLower(q[:6]) == "insert" {
+				rows, err := r.RowsAffected()
+				if err != nil {
+					tx.Rollback()
+					return err
+				}
+				if rows < 1 {
+					tx.Rollback()
+					return fmt.Errorf("Insert query failed to insert rows")
+				}
 			}
 		}
 		_, err = tx.Exec("INSERT INTO migrations (id) VALUES ($1);", f.Name())

@@ -4,15 +4,8 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/m50/shinidex/pkg/types"
 )
-
-type User struct {
-	ID       string
-	Email    string
-	Password string
-	Created  int64//time.Time
-	Updated  int64//time.Time
-}
 
 type UserDB struct {
 	conn *sqlx.DB
@@ -22,25 +15,25 @@ func (db Database) Users() UserDB {
 	return UserDB(db)
 }
 
-func (db UserDB) FindByID(id string) (User, error) {
-	user := User{}
+func (db UserDB) FindByID(id string) (types.User, error) {
+	user := types.User{}
 	err := db.conn.Get(&user, "SELECT * FROM users WHERE id = $1", id)
 	return user, err
 }
 
-func (db UserDB) FindByEmail(email string) (User, error) {
-	user := User{}
+func (db UserDB) FindByEmail(email string) (types.User, error) {
+	user := types.User{}
 	err := db.conn.Get(&user, "SELECT * FROM users WHERE email = $1", email)
 	return user, err
 }
 
-func (db UserDB) FindByUsername(username string) (User, error) {
-	user := User{}
+func (db UserDB) FindByUsername(username string) (types.User, error) {
+	user := types.User{}
 	err := db.conn.Get(&user, "SELECT * FROM users WHERE username = $1", username)
 	return user, err
 }
 
-func (db UserDB) Insert(user User) error {
+func (db UserDB) Insert(user types.User) error {
 	query := `
 	INSERT INTO users (id, email, password, created, updated)
 	VALUES (:id, :email, :password, :created, :updated);
@@ -52,7 +45,7 @@ func (db UserDB) Insert(user User) error {
 	return err
 }
 
-func (db UserDB) Update(user User) error {
+func (db UserDB) Update(user types.User) error {
 	query := `
 	UPDATE users
 	SET email = :email,
