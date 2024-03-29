@@ -30,7 +30,6 @@ func (db *Database) Migrate(path string) error {
 
 	tx := db.conn.MustBegin()
 	for _, f := range files {
-		fmt.Println("Migrating " + f.Name())
 		var res int
 		if err := tx.Get(&res, "SELECT count(*) FROM migrations WHERE id = $1;", f.Name()); err != nil {
 			tx.Rollback()
@@ -39,6 +38,7 @@ func (db *Database) Migrate(path string) error {
 		if res == 1 {
 			continue
 		}
+		fmt.Print("Migrating " + f.Name() + "...")
 
 		sql, err := os.ReadFile(path + "/" + f.Name())
 		if err != nil {
@@ -55,7 +55,8 @@ func (db *Database) Migrate(path string) error {
 				tx.Rollback()
 				return err
 			}
-			if strings.ToLower(q[:6]) == "insert" {
+			cmd := strings.ToLower(q[:6])
+			if cmd == "insert" || cmd == "delete" || cmd == "update" {
 				rows, err := r.RowsAffected()
 				if err != nil {
 					tx.Rollback()
@@ -63,7 +64,7 @@ func (db *Database) Migrate(path string) error {
 				}
 				if rows < 1 {
 					tx.Rollback()
-					return fmt.Errorf("Insert query failed to insert rows")
+					return fmt.Errorf("Insert query failed to %s rows for %s", cmd, f.Name())
 				}
 			}
 		}
@@ -72,6 +73,7 @@ func (db *Database) Migrate(path string) error {
 			tx.Rollback()
 			return err
 		}
+		fmt.Println(" done")
 	}
 	tx.Commit()
 	return nil

@@ -97,4 +97,8 @@ func TestPokemon(t *testing.T) {
 	assert.Nil(t, err, "Unable to lookup Calyrex and it's forms")
 	assert.Equal(t, 898, calyrex.NationalDexNumber)
 	assert.Len(t, calyrex.Forms, 2)
+
+	first30, err := db.Pokemon().Get(30, 1)
+	assert.Nil(t, err, "Failed to get first 30 pokemon")
+	assert.Equal(t, "bulbasaur", first30[0].ID)
 }

@@ -2,6 +2,7 @@ package database
 
 import (
 	"github.com/jmoiron/sqlx"
+	"github.com/m50/shinidex/pkg/math"
 	"github.com/m50/shinidex/pkg/types"
 )
 
@@ -29,7 +30,7 @@ func (db PokemonDB) GetAll() ([]types.Pokemon, error) {
 
 func (db PokemonDB) Get(rows, page int) ([]types.Pokemon, error) {
 	pokemon := []types.Pokemon{}
-	offset := (page - 1) * rows
+	offset := math.Max(page - 1, 0) * rows
 	err := db.conn.Select(&pokemon, "SELECT * FROM pokemon ORDER BY national_dex_number LIMIT $1 OFFSET $2", rows, offset)
 	return pokemon, err
 }
@@ -38,6 +39,12 @@ func (db PokemonDB) FindByID(id string) (types.Pokemon, error) {
 	pokemon := types.Pokemon{}
 	err := db.conn.Get(&pokemon, "SELECT * FROM pokemon WHERE id = $1", id)
 	return pokemon, err
+}
+
+func (db PokemonFormsDB) GetAll() ([]types.PokemonForm, error) {
+	forms := []types.PokemonForm{}
+	err := db.conn.Select(&forms, "SELECT * FROM pokemon_forms")
+	return forms, err
 }
 
 func (db PokemonFormsDB) FindByPokemonID(pokemonID string) ([]types.PokemonForm, error) {
@@ -66,4 +73,10 @@ func (db PokemonDB) FindWithFormsByID(pokemonID string) (types.PokemonWithForms,
 		Pokemon: pokemon,
 		Forms: forms,
 	}, nil
+}
+
+func (db PokemonDB) GetAllAsSeparatForms() ([]types.Pokemon, error) {
+	pokemon := []types.Pokemon{}
+	err := db.conn.Select(&pokemon, "SELECT * FROM pokemon ORDER BY national_dex_number")
+	return pokemon, err
 }

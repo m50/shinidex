@@ -1,12 +1,68 @@
 package pokemon
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/m50/shinidex/pkg/types"
+	"github.com/m50/shinidex/pkg/math"
+)
 
 templ Main() {
-	<span>Hello world</span>
-	<button class="bg-indigo-500 text-slate-200 p-3 rounded-xl hover:bg-indigo-700" hx-get="/click" hx-target="previous">Click me</button>
+	<div class="grid gap-4 grid-cols-6 p-4">
+		@injector(1)
+	</div>
 }
 
-templ Click(click int) {
-	I was clicked { fmt.Sprint(click) } times!!!
+templ List(pokemon []types.Pokemon) {
+	<div class="grid gap-4 grid-cols-6 p-4">
+		for i := 0; i < (len(pokemon) / 30) + 1; i++ {
+			@Box(i+1, pokemon[i*30:math.Min((i*30)+30, len(pokemon))], false)
+		}
+	</div>
+}
+
+templ Box(boxNum int, pokemon []types.Pokemon, continueInjecting bool) {
+	<div class="rounded-xl border border-indigo-800">
+		<span class="rounded-t-xl bg-indigo-500 w-full flex justify-start h-8 text-xl">
+			<span class="rounded-t-xl h-full bg-indigo-100 px-8 text-slate-800">Box { fmt.Sprint(boxNum) }</span>
+		</span>
+		<div class="bg-indigo-100 grid grid-cols-6 rounded-b-xl p-2 justify-center items-center">
+			for i := 0; i < 30; i++ {
+				if len(pokemon) > i {
+					@Pokemon(pokemon[i], true)
+				} else {
+					<div class="w-14 h-14">&nbsp;</div>
+				}
+			}
+		</div>
+	</div>
+	if continueInjecting {
+		@injector(boxNum + 1)
+	}
+}
+
+templ Pokemon(pkmn types.Pokemon, caught bool) {
+	<div
+		class="w-14 h-14 text-slate-800 hover:bg-indigo-300 flex justify-center items-center rounded-xl"
+		title={ pkmn.Name }
+		hx-patch={ fmt.Sprintf("/pokemon/%s", pkmn.ID) }
+	>
+		<img
+			if caught {
+				class=""
+			} else {
+				class="filter grayscale hover:filter-none"
+			}
+			src={ fmt.Sprintf("https://img.pokemondb.net/sprites/home/normal/%s.png", pkmn.ID) }
+			alt={ pkmn.Name }
+		/>
+	</div>
+}
+
+templ injector(nextBoxNum int) {
+	<div
+		hx-get={ fmt.Sprintf("/pokemon/box/%d", nextBoxNum) }
+		hx-trigger="intersect once"
+		hx-swap="outerHTML"
+	></div>
 }

@@ -63,7 +63,7 @@ func generateId() string {
 	timeComponent := strconv.FormatInt(now, 36)
 	timeComponent = timeComponent[2:]
 
-	randComponent := "";
+	randComponent := ""
 	for i := 0; i < 5; i++ {
 		r := rand.Uint64()
 		randComponent += strconv.FormatUint(r, 36)

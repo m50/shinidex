@@ -28,6 +28,5 @@ func main() {
 	}
 
 	e := web.New(db)
-	e.Logger.Info("test")
-	// e.Logger.Fatal(e.Start(":1323"))
+	e.Logger.Fatal(e.Start(":1323"))
 }

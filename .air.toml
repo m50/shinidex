@@ -20,7 +20,10 @@ tmp_dir = "tmp"
   log = "build-errors.log"
   poll = false
   poll_interval = 0
-  post_cmd = []
+  post_cmd = [
+    "rm ./tmp/shinidex.db",
+    "kill $(ps | grep shinidex | grep main | awk '{print $1}')"
+  ]
   pre_cmd = [
     "templ generate",
     "bunx tailwindcss -i ./frontend/src/input.css -o ./assets/style.css",

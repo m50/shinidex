@@ -64,7 +64,7 @@ INSERT INTO pokemon_forms (pokemon_id, id, name, shiny_locked) VALUES
 ('rhydon', 'f', 'Female', 0),
 ('goldeen', 'f', 'Female', 0),
 ('seaking', 'f', 'Female', 0),
-('mrmime', 'galar', 'Galar', 0),
+('mr-mime', 'galar', 'Galar', 0),
 ('scyther', 'f', 'Female', 0),
 ('tauros', 'paldea', 'Paldea', 0),
 ('tauros', 'paldea-fire', 'Paldea Fire', 0),
