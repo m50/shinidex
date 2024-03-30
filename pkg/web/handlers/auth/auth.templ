@@ -1,5 +1,15 @@
 package auth
 
 templ LoginForm() {
-    <div></div>
+    <form hx-post="/auth/login">
+        <label for="email">
+            <span>Email:</span>
+            <input name="email" id="email" />
+        </label>
+        <label for="password">
+            <span>Password:</span>
+            <input name="password" id="password" type="password" />
+        </label>
+        <button type="submit">Login</button>
+    </form>
 }

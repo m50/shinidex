@@ -6,10 +6,17 @@ import (
 
 	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
+	"github.com/m50/shinidex/pkg/web/session"
 )
 
 func renderWrappedView(ctx echo.Context, t templ.Component) error {
-	base := BaseLayout()
+	user, err := session.GetAuthedUser(ctx)
+	var base templ.Component
+	if err != nil {
+		base = BaseLayout(nil)
+	} else {
+		base = BaseLayout(&user)
+	}
 	children := templ.WithChildren(ctx.Request().Context(), t)
 	return base.Render(children, ctx.Response().Writer)
 }

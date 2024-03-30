@@ -2,7 +2,10 @@ package web
 
 import (
 	"net/http"
+	"os"
 
+	"github.com/gorilla/sessions"
+	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
@@ -50,9 +53,10 @@ func New(db *database.Database) *echo.Echo {
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Format: "${time_rfc3339} \x1b[34mRQST\x1b[0m ${method} http://${host}${uri} : ${status} ${error}\n",
 	}))
+	e.Use(middleware.Recover())
 	e.Use(middleware.Gzip())
 	e.Use(middleware.Secure())
-	e.Use(middleware.Recover())
+	e.Use(session.Middleware(sessions.NewCookieStore([]byte(os.Getenv("AUTH_TOKEN")))))
 
 	router(e)
 

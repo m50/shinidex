@@ -1,6 +1,8 @@
 package views
 
-templ BaseLayout() {
+import "github.com/m50/shinidex/pkg/types"
+
+templ BaseLayout(authedUser *types.User) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -11,29 +13,59 @@ templ BaseLayout() {
 			<title>Shinidex</title>
 		</head>
 		<body class="min-h-screen flex flex-col">
-			@Header()
-			<main class="pt-8 flex-1 bg-slate-800 text-slate-200 w-full h-full flex justify-center">
-				<div class="flex flex-col px-4 lg:px-0 w-full">
-					{ children... }
-				</div>
-			</main>
+			@Header(authedUser)
+			@body() {
+				{ children... }
+			}
+			@notificationFeed()
 		</body>
 	</html>
 }
 
-templ Header() {
-	<header class="px-4 w-full flex gap-4 bg-indigo-500 text-slate-200 h-16 text-3xl justify-center items-center">
+templ Header(authedUser *types.User) {
+	<header hx-swap-oob="true" id="header" class="px-4 w-full flex gap-4 bg-indigo-500 text-slate-200 h-16 text-3xl justify-center items-center">
 		<span class="flex-none">Shinidex</span>
 		<span class="grow">&nbsp;</span>
 		<div class="text-xl">
 			<a href="/pokemon/" class="hover:text-slate-400 flex-none">Pokémon</a>
-			<a class="hover:text-slate-400 flex-none">Pokédexes</a>
-			<a class="hover:text-slate-400 flex-none">Account</a>
+			if authedUser != nil {
+				<a class="hover:text-slate-400 flex-none">Pokédexes</a>
+				<a class="hover:text-slate-400 flex-none">Account</a>
+			} else {
+				<a href="/auth/login" class="hover:text-slate-400 flex-none">Login</a>
+				<a href="/auth/register" class="hover:text-slate-400 flex-none">Register</a>
+			}
 		</div>
 	</header>
 }
 
+templ body() {
+	<main class="pt-8 flex-1 bg-slate-800 text-slate-200 w-full h-full flex justify-center">
+		<div class="flex flex-col px-4 lg:px-0 w-full">
+			{ children... }
+		</div>
+	</main>
+}
+
+templ notificationFeed() {
+	<div id="notification-feed" class="fixed top-0 bottom-0 right-0 w-1/4 flex flex-col-reverse items-end gap-4 p-4"></div>
+}
+
 // OOB Swap into a notification feed
 templ Error(err error) {
-	<div></div>
+	<div hx-swap-oob="afterbegin:#notification-feed">
+		<div class="transition-opacity duration-1000 flex flex-col bg-red-600/90 border-red-800 border rounded-xl p-4 text-slate-200">
+			<span class="text-2xl">Error</span>
+			<span class="text-lg">{ err.Error() }</span>
+		</div>
+	</div>
+}
+
+templ Info(title string, body string) {
+	<div hx-swap-oob="afterbegin:#notification-feed">
+		<div class="transition-opacity duration-1000 flex flex-col bg-blue-500/90 border-blue-800 border rounded-xl p-4 text-slate-200">
+			<span class="text-2xl">{ title }</span>
+			<span class="text-lg">{ body }</span>
+		</div>
+	</div>
 }

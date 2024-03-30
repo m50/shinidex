@@ -1,6 +1,7 @@
 package pokemon
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -8,10 +9,6 @@ import (
 	"github.com/m50/shinidex/pkg/database"
 	"github.com/m50/shinidex/pkg/views"
 )
-
-type Context interface {
-	DB() *database.Database
-}
 
 func Router(e *echo.Echo) {
 	group := e.Group("/pokemon")
@@ -27,7 +24,7 @@ func home(c echo.Context) error {
 }
 
 func list(c echo.Context) error {
-	ctx := c.(Context)
+	ctx := c.(database.DBContext)
 	pkmn, err := ctx.DB().Pokemon().GetAll()
 	if err != nil {
 		return views.RenderError(c, err)
@@ -36,7 +33,7 @@ func list(c echo.Context) error {
 }
 
 func box(c echo.Context) error {
-	ctx := c.(Context)
+	ctx := c.(database.DBContext)
 	pageNum, err := strconv.Atoi(c.Param("box"))
 	if err != nil {
 		return views.RenderError(c, err)
@@ -49,10 +46,13 @@ func box(c echo.Context) error {
 }
 
 func toggleCaught(c echo.Context) error {
-	ctx := c.(Context)
+	ctx := c.(database.DBContext)
 	pkmn, err := ctx.DB().Pokemon().FindByID(c.Param("pokemon"))
 	if err != nil {
 		return views.RenderError(c, err)
 	}
-	return views.RenderView(c, http.StatusOK, Pokemon(pkmn, true))
+	return views.RenderViews(c, http.StatusOK,
+		Pokemon(pkmn, true),
+		views.Info("Caught", fmt.Sprintf("You caught a %s!", pkmn.Name)),
+	)
 }

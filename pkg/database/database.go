@@ -13,6 +13,10 @@ import (
 	"github.com/tursodatabase/go-libsql"
 )
 
+type DBContext interface {
+	DB() *Database
+}
+
 type Database struct {
 	conn *sqlx.DB
 }
