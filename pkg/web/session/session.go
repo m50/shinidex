@@ -42,33 +42,34 @@ func Close(c echo.Context) error {
 	}
 
 	delete(sess.Values, "UserID")
+	sess.Save(c.Request(), c.Response())
 	return nil
 }
 
-func GetAuthedUser(c echo.Context) (types.User, error) {
+func GetAuthedUser(c echo.Context) (*types.User, error) {
 	if user, ok := c.Get("user").(types.User); ok {
-		return user, nil
+		return &user, nil
 	}
 
 	sess, err := session.Get("session", c)
 	if err != nil {
-		return types.User{}, err
+		return nil, err
 	}
 	db := c.(database.DBContext).DB()
 
 	foundID, ok := sess.Values["UserID"]
 	if !ok {
-		return types.User{}, ErrNotAuthed
+		return nil, ErrNotAuthed
 	}
 	userID, ok := foundID.(string)
 	if !ok {
-		return types.User{}, ErrNotAuthed
+		return nil, ErrNotAuthed
 	}
 	user, err := db.Users().FindByID(userID)
 	if err != nil {
-		return types.User{}, err
+		return nil, err
 	}
 	c.Set("user", user)
 
-	return user, nil
+	return &user, nil
 }

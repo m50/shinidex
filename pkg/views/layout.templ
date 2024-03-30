@@ -23,24 +23,24 @@ templ BaseLayout(authedUser *types.User) {
 }
 
 templ Header(authedUser *types.User) {
-	<header hx-swap-oob="true" id="header" class="px-4 w-full flex gap-4 bg-indigo-500 text-slate-200 h-16 text-3xl justify-center items-center">
+	<header hx-swap-oob="true" id="header" class="px-4 w-full flex gap-4 bg-indigo-500 text-slate-200 h-16 text-3xl justify-between items-center">
 		<span class="flex-none">Shinidex</span>
-		<span class="grow">&nbsp;</span>
-		<div class="text-xl">
-			<a href="/pokemon/" class="hover:text-slate-400 flex-none">Pokémon</a>
+		<div class="text-xl flex gap-4">
+			<a hx-target="#app" hx-get="/pokemon/" class="hover:text-indigo-400 flex-none">Pokémon</a>
 			if authedUser != nil {
-				<a class="hover:text-slate-400 flex-none">Pokédexes</a>
-				<a class="hover:text-slate-400 flex-none">Account</a>
+				<a class="hover:text-indigo-400 flex-none cursor-pointer">Pokédexes</a>
+				<a class="hover:text-indigo-400 flex-none cursor-pointer">Account</a>
+				<a hx-replace-url="true" hx-target="#app" hx-post="/auth/logout" class="hover:text-indigo-400 flex-none cursor-pointer">Logout</a>
 			} else {
-				<a href="/auth/login" class="hover:text-slate-400 flex-none">Login</a>
-				<a href="/auth/register" class="hover:text-slate-400 flex-none">Register</a>
+				<a href="/auth/login" class="hover:text-indigo-400 flex-none cursor-pointer">Login</a>
+				<a href="/auth/register" class="hover:text-indigo-400 flex-none cursor-pointer">Register</a>
 			}
 		</div>
 	</header>
 }
 
 templ body() {
-	<main class="pt-8 flex-1 bg-slate-800 text-slate-200 w-full h-full flex justify-center">
+	<main id="app" class="pt-8 flex-1 bg-slate-800 text-slate-200 w-full h-full flex justify-center">
 		<div class="flex flex-col px-4 lg:px-0 w-full">
 			{ children... }
 		</div>
@@ -48,7 +48,7 @@ templ body() {
 }
 
 templ notificationFeed() {
-	<div id="notification-feed" class="fixed top-0 bottom-0 right-0 w-1/4 flex flex-col-reverse items-end gap-4 p-4"></div>
+	<div id="notification-feed" class="pointer-events-none fixed top-0 bottom-0 right-0 w-1/4 flex flex-col-reverse items-end gap-4 p-4"></div>
 }
 
 // OOB Swap into a notification feed

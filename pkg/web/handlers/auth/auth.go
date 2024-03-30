@@ -24,7 +24,7 @@ func Router(e *echo.Echo) {
 }
 
 func registerForm(c echo.Context) error {
-	return nil
+	return views.RenderView(c, http.StatusOK, RegisterForm())
 }
 
 func register(c echo.Context) error {
@@ -48,13 +48,14 @@ func login(c echo.Context) error {
 	}
 
 	if err := session.New(c, user); err != nil {
+		c.Logger().Error(err)
 		return views.RenderError(c, err)
 	}
 
-	return c.Redirect(http.StatusTemporaryRedirect, "/")
+	return c.Redirect(http.StatusMovedPermanently, "/")
 }
 
 func logout(c echo.Context) error {
 	session.Close(c)
-	return nil
+	return c.Redirect(http.StatusMovedPermanently, "/auth/login")
 }

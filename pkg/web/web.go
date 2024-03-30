@@ -10,6 +10,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 	"github.com/m50/shinidex/pkg/database"
+	"github.com/m50/shinidex/pkg/views"
 	"github.com/m50/shinidex/pkg/web/handlers/auth"
 	"github.com/m50/shinidex/pkg/web/handlers/pokemon"
 )
@@ -56,7 +57,8 @@ func New(db *database.Database) *echo.Echo {
 	e.Use(middleware.Recover())
 	e.Use(middleware.Gzip())
 	e.Use(middleware.Secure())
-	e.Use(session.Middleware(sessions.NewCookieStore([]byte(os.Getenv("AUTH_TOKEN")))))
+	e.Use(session.Middleware(sessions.NewCookieStore([]byte(os.Getenv("AUTH_KEY")))))
+	e.Use(views.HeaderMiddleware)
 
 	router(e)
 

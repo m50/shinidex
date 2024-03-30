@@ -6,6 +6,8 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/m50/shinidex/pkg/database"
+	"github.com/m50/shinidex/pkg/database/passwords"
+	"github.com/m50/shinidex/pkg/types"
 	"github.com/m50/shinidex/pkg/web"
 )
 
@@ -24,6 +26,18 @@ func main() {
 	defer db.Close()
 	if err = db.Migrate("./migrations"); err != nil {
 		log.Fatalf("Failed to migrate: %s", err)
+		return
+	}
+	p, err := passwords.HashPassword("test")
+	if err != nil {
+		log.Fatalf("failed to hash password for test user")
+		return
+	}
+	if err := db.Users().Insert(types.User{
+		Email: "test@test.com",
+		Password: p,
+	}); err != nil {
+		log.Fatalf("Failed to insert test user")
 		return
 	}
 
