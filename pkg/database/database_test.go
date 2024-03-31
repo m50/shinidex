@@ -50,7 +50,7 @@ func TestUser(t *testing.T) {
 	t.Parallel()
 	db := setupDB(t)
 	defer db.Close()
-	err := db.Users().Insert(types.User{
+	_, err := db.Users().Insert(types.User{
 		Email:    "test@test.com",
 		Password: "my-password",
 	})
@@ -92,11 +92,6 @@ func TestPokemon(t *testing.T) {
 	venaforms, err := db.Pokemon().Forms().FindByPokemonID("venusaur")
 	assert.Nil(t, err, "Unable to lookup Venasaur forms")
 	assert.Len(t, venaforms, 2)
-
-	calyrex, err := db.Pokemon().FindWithFormsByID("calyrex")
-	assert.Nil(t, err, "Unable to lookup Calyrex and it's forms")
-	assert.Equal(t, 898, calyrex.NationalDexNumber)
-	assert.Len(t, calyrex.Forms, 2)
 
 	first30, err := db.Pokemon().Get(30, 1)
 	assert.Nil(t, err, "Failed to get first 30 pokemon")

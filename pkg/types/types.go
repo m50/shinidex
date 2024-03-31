@@ -3,6 +3,9 @@ package types
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
+
+	"github.com/m50/shinidex/pkg/math"
 )
 
 type User struct {
@@ -27,6 +30,80 @@ const (
 	Paldea
 	UNKNOWN = 0
 )
+
+type PokemonList []Pokemon
+
+func (p PokemonList) Box(i int) PokemonList {
+	start := i * 30
+	end := math.Min((i*30)+30, len(p))
+	return p[start:end]
+}
+
+func (p PokemonList) GMax() PokemonList {
+	r := PokemonList{}
+	for _, pkmn := range p {
+		if strings.Contains(pkmn.ID, "gigantamax") {
+			r = append(r, pkmn)
+		}
+	}
+	return r
+}
+
+func (p PokemonList) Female() PokemonList {
+	r := PokemonList{}
+	for _, pkmn := range p {
+		if pkmn.ID[len(pkmn.ID)-1:] == "f" {
+			r = append(r, pkmn)
+		} else if strings.Contains(pkmn.ID, "female") {
+			r = append(r, pkmn)
+		}
+	}
+	return r
+}
+
+func (p PokemonList) Regional() PokemonList {
+	r := PokemonList{}
+	for _, pkmn := range p {
+		if strings.Contains(pkmn.ID, "alolan") {
+			r = append(r, pkmn)
+		} else if strings.Contains(pkmn.ID, "galarian") {
+			r = append(r, pkmn)
+		} else if strings.Contains(pkmn.ID, "paldean") {
+			r = append(r, pkmn)
+		} else if strings.Contains(pkmn.ID, "hisuian") {
+			r = append(r, pkmn)
+		}
+	}
+	return r
+}
+
+func (p PokemonList) Forms() PokemonList {
+	r := PokemonList{}
+	for _, pkmn := range p {
+		if strings.Contains(pkmn.ID, "-") {
+			if pkmn.ID == "porygon-z" || pkmn.ID == "mime-jr" || pkmn.ID == "mr-mime" {
+				continue
+			}
+			if strings.Contains(pkmn.ID, "tapu-") {
+				continue
+			}
+			if pkmn.ID[len(pkmn.ID) - 2:] == "-o" {
+				continue
+			}
+			if pkmn.NationalDexNumber >= 984 && pkmn.NationalDexNumber <= 995 {
+				continue
+			}
+			if pkmn.NationalDexNumber >= 1001 && pkmn.NationalDexNumber <= 1010 {
+				continue
+			}
+			if pkmn.NationalDexNumber >= 1020 && pkmn.NationalDexNumber <= 1023 {
+				continue
+			}
+			r = append(r, pkmn)
+		}
+	}
+	return r
+}
 
 type Pokemon struct {
 	ID                string
@@ -66,11 +143,6 @@ type PokemonForm struct {
 	ShinyLocked bool   `db:"shiny_locked"`
 }
 
-type PokemonWithForms struct {
-	Pokemon
-	Forms []PokemonForm
-}
-
 type Pokedex struct {
 	ID      string
 	Name    string
@@ -87,7 +159,7 @@ func NewPokedex(ownerID, name string, config PokedexConfig) (Pokedex, error) {
 	}
 	return Pokedex{
 		OwnerID: ownerID,
-		Name: name,
+		Name:    name,
 		Config:  string(c),
 	}, nil
 }
@@ -115,6 +187,7 @@ func (f FormLocation) ToString() string {
 
 type PokedexConfig struct {
 	Shiny         bool
+	Forms         FormLocation
 	GenderForms   FormLocation
 	RegionalForms FormLocation
 	GMaxForms     FormLocation

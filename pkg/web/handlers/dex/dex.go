@@ -16,11 +16,12 @@ func Router(e *echo.Echo) {
 	g := e.Group("/dex", views.AuthnMiddleware())
 
 	g.GET("", list)
-	g.GET("/:dex", show)
 	g.GET("/new", new)
 	g.POST("", create)
 	g.PUT("/:dex", update)
 	g.DELETE("/:dex", delete)
+
+	showRouter(g)
 }
 
 func list(c echo.Context) error {
@@ -36,10 +37,6 @@ func list(c echo.Context) error {
 	return views.RenderView(c, http.StatusOK, List(dexes))
 }
 
-func show(c echo.Context) error {
-	return nil
-}
-
 func new(c echo.Context) error {
 	return views.RenderView(c, http.StatusOK, New())
 }
@@ -52,6 +49,7 @@ func create(c echo.Context) error {
 	name := c.FormValue("name")
 	cfg := types.PokedexConfig{
 		Shiny:         form.ParseBool(c.FormValue("shiny")),
+		Forms:         types.FormLocation(form.ParseInt(c.FormValue("forms"))),
 		GenderForms:   types.FormLocation(form.ParseInt(c.FormValue("gender"))),
 		RegionalForms: types.FormLocation(form.ParseInt(c.FormValue("regional"))),
 		GMaxForms:     types.FormLocation(form.ParseInt(c.FormValue("gmax"))),

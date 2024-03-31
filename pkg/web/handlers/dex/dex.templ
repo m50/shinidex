@@ -5,106 +5,51 @@ import "fmt"
 
 templ List(dexes []types.Pokedex) {
 	<div class="flex justify-center">
-	<div class="flex flex-col bg-slate-900 rounded-xl w-1/2 p-2">
+	<div class="flex flex-col w-1/2 gap-6">
 		<h2 class="text-6xl flex justify-center">Living Dexes</h2>
-		<div class="grid gap-2 grid-cols-3">
-			for _, dex := range dexes {
-				<span>{ fmt.Sprint(dex) }</span>
-			}
-		</div>
 		<div class="flex justify-center">
 			<button hx-get="/dex/new" hx-target="#app" hx-push-url="true" class="bg-indigo-500 rounded-xl py-2 px-4 flex-none text-xl mt-4">
 			Add Living Dex
 			</button>
 		</div>
+		<div class="grid gap-2 grid-cols-4">
+			for _, dex := range dexes {
+				if cfg, err := dex.GetConfig(); err == nil {
+					<div
+						hx-get={ string(templ.URL(fmt.Sprintf("/dex/%s", dex.ID))) }
+						hx-push-url="true"
+						hx-target="#app"
+						class="
+							flex flex-col items-center gap-2 rounded-xl
+							bg-slate-700 border border-slate-600 p-2
+							cursor-pointer hover:bg-indigo-700
+						"
+					>
+						<div class="text-5xl">
+							if cfg.Shiny {
+								<span>✨</span>
+							}
+							<span>{ dex.Name }</span>
+							if cfg.Shiny {
+								<span>✨</span>
+							}
+						</div>
+						<div class="flex flex-col items-center">
+							<span class="font-bold">Gender Forms</span>
+							<span>{ cfg.GenderForms.ToString() }</span>
+						</div>
+						<div class="flex flex-col items-center">
+							<span class="font-bold">Regional Forms</span>
+							<span>{ cfg.RegionalForms.ToString() }</span>
+						</div>
+						<div class="flex flex-col items-center">
+							<span class="font-bold">Gigantamax Forms</span>
+							<span>{ cfg.GMaxForms.ToString() }</span>
+						</div>
+					</div>
+				}
+			}
+		</div>
 	</div>
-	</div>
-}
-
-templ New() {
-	<div class="flex justify-center p-4 h-full">
-    <form hx-post="/dex" class="flex gap-4 flex-col w-96 p-4 rounded-xl" hx-target="#app" hx-swap="innerHTML" hx-push-url="true">
-        <span class="flex justify-center mb-8"><h3 class="text-5xl">New Living Dex</h3></span>
-        <div class="flex flex-col">
-            <label class="block text-xl" for="name">Name:</label>
-            <input
-                name="name"
-                id="name"
-                class="
-                    rounded-xl focus:ring-blue-500 focus:border-blue-500 p-2.5
-                    block text-slate-300 bg-slate-700 border border-slate-600
-                "
-                placeholder="Home Shiny Dex"
-                required="true"
-            />
-        </div>
-
-		<div class="flex gap-2 h-6 items-center">
-			<label class="block text-xl" for="shiny">Shiny:</label>
-			<input
-				type="checkbox"
-				required="true"
-				name="shiny"
-				id="shiny"
-                class="
-                    rounded focus:ring-blue-500 focus:border-blue-500 w-4 h-4
-                    text-indigo-600 bg-slate-700 border border-slate-600
-                "
-			/>
-		</div>
-
-        <div class="flex flex-col">
-			<label class="block text-xl" for="gender">Gender Forms:</label>
-			<select
-				required="true"
-				name="gender"
-				id="gender"
-				class="
-					rounded-xl focus:ring-blue-500 focus:border-blue-500 p-2.5
-					block text-slate-300 bg-slate-700 border border-slate-600
-				"
-			>
-				<option value={ types.Off.Value() } selected="true">{ types.Off.ToString() }</option>
-				<option value={ types.After.Value() }>{ types.After.ToString() }</option>
-				<option value={ types.Separate.Value() }>{ types.Separate.ToString() }</option>
-			</select>
-		</div>
-
-        <div class="flex flex-col">
-			<label class="block text-xl" for="regional">Regional Forms:</label>
-			<select
-				required="true"
-				name="regional"
-				id="regional"
-				class="
-					rounded-xl focus:ring-blue-500 focus:border-blue-500 p-2.5
-					block text-slate-300 bg-slate-700 border border-slate-600
-				"
-			>
-				<option value={ types.Off.Value() } selected="true">{ types.Off.ToString() }</option>
-				<option value={ types.After.Value() }>{ types.After.ToString() }</option>
-				<option value={ types.Separate.Value() }>{ types.Separate.ToString() }</option>
-			</select>
-		</div>
-
-        <div class="flex flex-col">
-			<label class="block text-xl" for="gmax">Gigantamax Forms:</label>
-			<select
-				required="true"
-				name="gmax"
-				id="gmax"
-				class="
-					rounded-xl focus:ring-blue-500 focus:border-blue-500 p-2.5
-					block text-slate-300 bg-slate-700 border border-slate-600
-				"
-			>
-				<option value={ types.Off.Value() } selected="true">{ types.Off.ToString() }</option>
-				<option value={ types.After.Value() }>{ types.After.ToString() }</option>
-				<option value={ types.Separate.Value() }>{ types.Separate.ToString() }</option>
-			</select>
-		</div>
-
-        <button type="submit" class="bg-indigo-500 rounded-xl py-2 px-4 flex-none text-xl mt-4">Create</button>
-	</form>
 	</div>
 }

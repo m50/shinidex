@@ -5,25 +5,53 @@ import (
 
 	"github.com/m50/shinidex/pkg/types"
 	"github.com/m50/shinidex/pkg/math"
+	"strings"
 )
 
-templ List(pokemon []types.Pokemon) {
+templ List(pokemon types.PokemonList, shiny bool) {
 	<div class="grid gap-4 grid-cols-6 p-4">
-		for i := 0; i < (len(pokemon) / 30) + 1; i++ {
-			@Box(i+1, pokemon[i*30:math.Min((i*30)+30, len(pokemon))])
+		for i := 0; i < math.Ceil(float64(len(pokemon)) / 30); i++ {
+			@Box(i+1, pokemon.Box(i), shiny)
 		}
 	</div>
 }
 
-templ Box(boxNum int, pokemon []types.Pokemon) {
-	<div class="rounded-xl border border-indigo-800">
-		<span class="rounded-t-xl bg-indigo-500 w-full flex justify-start h-8 text-xl">
+func shinyIconClasses(shiny bool) []string {
+	r := []string{"block", "text-2xl", "cursor-pointer", "hover:bg-indigo-200", "rounded-t-xl", "px-2"}
+	if shiny {
+		r = append(r, "bg-indigo-100")
+	}
+
+	return r
+}
+
+templ Box(boxNum int, pokemon types.PokemonList, shiny bool) {
+	<div id={ fmt.Sprintf("box-%d", boxNum) } class="rounded-xl border border-indigo-800">
+		<span class="rounded-t-xl bg-indigo-500 w-full flex justify-between h-8 text-xl">
 			<span class="rounded-t-xl h-full bg-indigo-100 px-8 text-slate-800">Box { fmt.Sprint(boxNum) }</span>
+			<form class="flex" hx-swap="outerHTML" hx-get={ fmt.Sprintf("/pokemon/box/%d", boxNum) } hx-target={ fmt.Sprintf("#box-%d", boxNum) } hx-trigger="change">
+				<label>
+					<span class={ shinyIconClasses(shiny) }>✨</span>
+					<input
+						type="checkbox"
+						required="true"
+						name="shiny"
+						id="shiny"
+						class="hidden
+							rounded focus:ring-blue-500 focus:border-blue-500 w-4 h-4
+							text-indigo-600 bg-slate-700 border border-slate-600
+						"
+						if shiny {
+							checked="checked"
+						}
+					/>
+				</label>
+			</form>
 		</span>
 		<div class="bg-indigo-100 grid grid-cols-6 rounded-b-xl p-2 justify-center items-center">
 			for i := 0; i < 30; i++ {
 				if len(pokemon) > i {
-					@Pokemon(pokemon[i], true)
+					@Pokemon(pokemon[i], shiny)
 				} else {
 					<div class="w-14 h-14">&nbsp;</div>
 				}
@@ -32,19 +60,28 @@ templ Box(boxNum int, pokemon []types.Pokemon) {
 	</div>
 }
 
-templ Pokemon(pkmn types.Pokemon, caught bool) {
+func sanitizeID(id string) string {
+	s, _ := strings.CutSuffix(id, "-antique")
+	s, _ = strings.CutSuffix(s, "-masterpiece")
+	s, _ = strings.CutSuffix(s, "-artisan")
+
+	return s
+}
+
+func shinyStr(s bool) string {
+	if s {
+		return "shiny"
+	}
+	return "normal"
+}
+
+templ Pokemon(pkmn types.Pokemon, shiny bool) {
 	<div
 		class="w-14 h-14 text-slate-800 hover:bg-indigo-300 flex justify-center items-center rounded-xl"
 		title={ pkmn.Name }
-		hx-patch={ fmt.Sprintf("/pokemon/%s", pkmn.ID) }
 	>
 		<img
-			if caught {
-				class=""
-			} else {
-				class="filter grayscale hover:filter-none"
-			}
-			src={ fmt.Sprintf("https://img.pokemondb.net/sprites/home/normal/%s.png", pkmn.ID) }
+			src={ fmt.Sprintf("https://img.pokemondb.net/sprites/home/%s/%s.png", shinyStr(shiny), sanitizeID(pkmn.ID)) }
 			alt={ pkmn.Name }
 		/>
 	</div>

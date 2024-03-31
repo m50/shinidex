@@ -1,6 +1,9 @@
 package database
 
 import (
+	"fmt"
+	"slices"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/m50/shinidex/pkg/math"
 	"github.com/m50/shinidex/pkg/types"
@@ -22,15 +25,15 @@ func (db PokemonDB) Forms() PokemonFormsDB {
 	return PokemonFormsDB(db)
 }
 
-func (db PokemonDB) GetAll() ([]types.Pokemon, error) {
-	pokemon := []types.Pokemon{}
+func (db PokemonDB) GetAll() (types.PokemonList, error) {
+	pokemon := types.PokemonList{}
 	err := db.conn.Select(&pokemon, "SELECT * FROM pokemon ORDER BY national_dex_number")
 	return pokemon, err
 }
 
-func (db PokemonDB) Get(rows, page int) ([]types.Pokemon, error) {
-	pokemon := []types.Pokemon{}
-	offset := math.Max(page - 1, 0) * rows
+func (db PokemonDB) Get(rows, page int) (types.PokemonList, error) {
+	pokemon := types.PokemonList{}
+	offset := math.Max(page-1, 0) * rows
 	err := db.conn.Select(&pokemon, "SELECT * FROM pokemon ORDER BY national_dex_number LIMIT $1 OFFSET $2", rows, offset)
 	return pokemon, err
 }
@@ -59,24 +62,32 @@ func (db PokemonFormsDB) FindByID(pokemonID string, formID string) (types.Pokemo
 	return form, err
 }
 
-func (db PokemonDB) FindWithFormsByID(pokemonID string) (types.PokemonWithForms, error) {
-	pokemon, err := db.FindByID(pokemonID)
+func (db PokemonDB) GetAllAsSeparatForms() (types.PokemonList, error) {
+	pokemon, err := db.GetAll()
 	if err != nil {
-		return types.PokemonWithForms{}, err
+		return nil, err
 	}
-	forms, err := db.Forms().FindByPokemonID(pokemonID)
+	forms, err := db.Forms().GetAll()
 	if err != nil {
-		return types.PokemonWithForms{}, err
+		return nil, err
 	}
-
-	return types.PokemonWithForms{
-		Pokemon: pokemon,
-		Forms: forms,
-	}, nil
-}
-
-func (db PokemonDB) GetAllAsSeparatForms() ([]types.Pokemon, error) {
-	pokemon := []types.Pokemon{}
-	err := db.conn.Select(&pokemon, "SELECT * FROM pokemon ORDER BY national_dex_number")
-	return pokemon, err
+	result := make(types.PokemonList, len(pokemon)+len(forms))
+	c := -1
+	for _, pkmn := range pokemon {
+		c++
+		result[c] = pkmn
+		for _, f := range forms {
+			if f.PokemonID != pkmn.ID {
+				continue
+			}
+			c++
+			result[c] = types.Pokemon{
+				ID:                pkmn.ID + "-" + f.ID,
+				Name:              fmt.Sprintf("%s (%s)", pkmn.Name, f.Name),
+				NationalDexNumber: pkmn.NationalDexNumber,
+				ShinyLocked:       f.ShinyLocked,
+			}
+		}
+	}
+	return slices.Clip(result), nil
 }
