@@ -1,5 +1,6 @@
 package views
 
+import "fmt"
 import "github.com/m50/shinidex/pkg/types"
 
 templ BaseLayout(authedUser *types.User) {
@@ -26,17 +27,21 @@ templ Header(authedUser *types.User) {
 	<header hx-swap-oob="true" id="header" class="px-4 w-full flex gap-4 bg-indigo-500 text-slate-200 h-16 text-3xl justify-between items-center">
 		<span class="flex-none">Shinidex</span>
 		<div class="text-xl flex gap-4">
-			<a hx-target="#app" hx-get="/pokemon/" class="hover:text-indigo-400 flex-none">Pokémon</a>
+			<a href="/pokemon" class="hover:text-indigo-400 flex-none">Pokémon</a>
 			if authedUser != nil {
-				<a class="hover:text-indigo-400 flex-none cursor-pointer">Pokédexes</a>
-				<a class="hover:text-indigo-400 flex-none cursor-pointer">Account</a>
-				<a hx-replace-url="true" hx-target="#app" hx-post="/auth/logout" class="hover:text-indigo-400 flex-none cursor-pointer">Logout</a>
+				<a href="/dex" class="hover:text-indigo-400 flex-none cursor-pointer">Pokédexes</a>
+				<a href={ templ.URL(fmt.Sprintf("/account/%s", authedUser.ID)) } class="hover:text-indigo-400 flex-none cursor-pointer">Account</a>
+				<a hx-push-url="true" hx-target="#app" hx-post="/auth/logout" class="hover:text-indigo-400 flex-none cursor-pointer">Logout</a>
 			} else {
 				<a href="/auth/login" class="hover:text-indigo-400 flex-none cursor-pointer">Login</a>
 				<a href="/auth/register" class="hover:text-indigo-400 flex-none cursor-pointer">Register</a>
 			}
 		</div>
 	</header>
+}
+
+templ empty() {
+	<div />
 }
 
 templ body() {
@@ -48,7 +53,8 @@ templ body() {
 }
 
 templ notificationFeed() {
-	<div id="notification-feed" class="pointer-events-none fixed top-0 bottom-0 right-0 w-1/4 flex flex-col-reverse items-end gap-4 p-4"></div>
+	<div id="notification-feed" class="pointer-events-none fixed top-0 bottom-0 right-0 w-1/4 flex flex-col-reverse items-end gap-4 p-4">
+	</div>
 }
 
 // OOB Swap into a notification feed
@@ -67,5 +73,41 @@ templ Info(title string, body string) {
 			<span class="text-2xl">{ title }</span>
 			<span class="text-lg">{ body }</span>
 		</div>
+	</div>
+}
+
+templ NotFound() {
+	<div class="flex justify-center items-center h-full">
+	<div class="flex flex-col gap-8 items-center">
+		<span class="text-8xl">404</span>
+		<img class="mt-[-3rem]" src="https://img.pokemondb.net/sprites/home/shiny/luxio-f.png" alt="Luxio" />
+		<span class="text-3xl">Uh oh!</span>
+		<span class="text-2xl">Luxio could not find this page!</span>
+		<a class="text-slate-500 underline hover:text-indigo-500" href="/">Take me somewhere I belong</a>
+	</div>
+	</div>
+}
+
+templ Unauthorized() {
+	<div class="flex justify-center items-center h-full">
+	<div class="flex flex-col gap-8 items-center">
+		<span class="text-8xl">401</span>
+		<img class="mt-[-3rem]" src="https://img.pokemondb.net/sprites/home/shiny/kricketot-f.png" alt="Kricketot" />
+		<span class="text-3xl">Uh oh!</span>
+		<span class="text-2xl">Kriketot has found that you can't access this page!</span>
+		<a class="text-slate-500 underline hover:text-indigo-500" href="/">Take me somewhere I belong</a>
+	</div>
+	</div>
+}
+
+templ Forbidden() {
+	<div class="flex justify-center items-center h-full">
+	<div class="flex flex-col gap-8 items-center">
+		<span class="text-8xl">403</span>
+		<img class="mt-[-3rem]" src="https://img.pokemondb.net/sprites/home/shiny/shinx-f.png" alt="Shinx" />
+		<span class="text-3xl">Uh oh!</span>
+		<span class="text-2xl">Shinx might try to zap you for accessing a page that doesn't belong to you!</span>
+		<a class="text-slate-500 underline hover:text-indigo-500" href="/">Take me somewhere I belong</a>
+	</div>
 	</div>
 }

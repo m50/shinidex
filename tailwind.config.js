@@ -1,14 +1,16 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
-    "./**/*.html",
-    "./**/*.templ",
-    "./frontend/*.ts",
-    "./frontend/**/*.ts",
+    './**/*.html',
+    './**/*.templ',
+    './frontend/*.ts',
+    './frontend/**/*.ts',
   ],
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/forms')
+  ],
 }
 

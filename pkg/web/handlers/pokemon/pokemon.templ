@@ -7,21 +7,15 @@ import (
 	"github.com/m50/shinidex/pkg/math"
 )
 
-templ Main() {
-	<div class="grid gap-4 grid-cols-6 p-4">
-		@injector(1)
-	</div>
-}
-
 templ List(pokemon []types.Pokemon) {
 	<div class="grid gap-4 grid-cols-6 p-4">
 		for i := 0; i < (len(pokemon) / 30) + 1; i++ {
-			@Box(i+1, pokemon[i*30:math.Min((i*30)+30, len(pokemon))], false)
+			@Box(i+1, pokemon[i*30:math.Min((i*30)+30, len(pokemon))])
 		}
 	</div>
 }
 
-templ Box(boxNum int, pokemon []types.Pokemon, continueInjecting bool) {
+templ Box(boxNum int, pokemon []types.Pokemon) {
 	<div class="rounded-xl border border-indigo-800">
 		<span class="rounded-t-xl bg-indigo-500 w-full flex justify-start h-8 text-xl">
 			<span class="rounded-t-xl h-full bg-indigo-100 px-8 text-slate-800">Box { fmt.Sprint(boxNum) }</span>
@@ -36,9 +30,6 @@ templ Box(boxNum int, pokemon []types.Pokemon, continueInjecting bool) {
 			}
 		</div>
 	</div>
-	if continueInjecting {
-		@injector(boxNum + 1)
-	}
 }
 
 templ Pokemon(pkmn types.Pokemon, caught bool) {
@@ -57,12 +48,4 @@ templ Pokemon(pkmn types.Pokemon, caught bool) {
 			alt={ pkmn.Name }
 		/>
 	</div>
-}
-
-templ injector(nextBoxNum int) {
-	<div
-		hx-get={ fmt.Sprintf("/pokemon/box/%d", nextBoxNum) }
-		hx-trigger="intersect once"
-		hx-swap="outerHTML"
-	></div>
 }

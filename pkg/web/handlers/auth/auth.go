@@ -20,7 +20,7 @@ func Router(e *echo.Echo) {
 	group.GET("/login", loginForm)
 	group.POST("/login", login, middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
 
-	group.POST("/logout", logout)
+	group.POST("/logout", logout, views.AuthnMiddleware())
 }
 
 func registerForm(c echo.Context) error {

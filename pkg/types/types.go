@@ -1,6 +1,9 @@
 package types
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 type User struct {
 	ID       string
@@ -70,29 +73,45 @@ type PokemonWithForms struct {
 
 type Pokedex struct {
 	ID      string
+	Name    string
 	OwnerID string `db:"owner_id"`
-	config  string
+	Config  string
 	Created int64
 	Updated int64
 }
 
-func NewPokedex(ownerID string, config PokedexConfig) (Pokedex, error) {
+func NewPokedex(ownerID, name string, config PokedexConfig) (Pokedex, error) {
 	c, err := json.Marshal(config)
 	if err != nil {
 		return Pokedex{}, err
 	}
 	return Pokedex{
 		OwnerID: ownerID,
-		config:  string(c),
+		Name: name,
+		Config:  string(c),
 	}, nil
 }
 
 type FormLocation int
+
 const (
 	Off FormLocation = iota
-	Inline
 	After
+	Separate
 )
+
+func (f FormLocation) Value() string {
+	return fmt.Sprint(f)
+}
+func (f FormLocation) ToString() string {
+	if f == Off {
+		return "Off"
+	} else if f == After {
+		return "After base form"
+	} else {
+		return "Separate"
+	}
+}
 
 type PokedexConfig struct {
 	Shiny         bool
@@ -101,9 +120,9 @@ type PokedexConfig struct {
 	GMaxForms     FormLocation
 }
 
-func (p Pokedex) Config() (PokedexConfig, error) {
+func (p Pokedex) GetConfig() (PokedexConfig, error) {
 	var conf PokedexConfig
-	err := json.Unmarshal([]byte(p.config), &conf)
+	err := json.Unmarshal([]byte(p.Config), &conf)
 	return conf, err
 }
 func (p *Pokedex) UpdateConfig(config PokedexConfig) error {
@@ -111,7 +130,7 @@ func (p *Pokedex) UpdateConfig(config PokedexConfig) error {
 	if err != nil {
 		return err
 	}
-	p.config = string(c)
+	p.Config = string(c)
 	return nil
 }
 

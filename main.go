@@ -33,7 +33,7 @@ func main() {
 		log.Fatalf("failed to hash password for test user")
 		return
 	}
-	if err := db.Users().Insert(types.User{
+	if _, err := db.Users().Insert(types.User{
 		Email: "test@test.com",
 		Password: p,
 	}); err != nil {

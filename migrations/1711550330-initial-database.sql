@@ -27,6 +27,7 @@ CREATE TABLE pokemon_forms (
 CREATE TABLE pokedexes (
 	id TEXT PRIMARY KEY,
 	owner_id TEXT NOT NULL,
+	name TEXT NOT NULL,
 	config TEXT NOT NULL,
 	created DATETIME NOT NULL,
 	updated DATETIME NOT NULL,

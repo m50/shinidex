@@ -27,7 +27,7 @@ func (db UserDB) FindByEmail(email string) (types.User, error) {
 	return user, err
 }
 
-func (db UserDB) Insert(user types.User) error {
+func (db UserDB) Insert(user types.User) (string, error) {
 	query := `
 	INSERT INTO users (id, email, password, created, updated)
 	VALUES (:id, :email, :password, :created, :updated);
@@ -36,7 +36,7 @@ func (db UserDB) Insert(user types.User) error {
 	user.Updated = time.Now().UTC().Unix()
 	user.ID = generateId()
 	_, err := db.conn.NamedExec(query, user)
-	return err
+	return user.ID, err
 }
 
 func (db UserDB) Update(user types.User) error {

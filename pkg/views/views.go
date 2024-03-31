@@ -9,6 +9,17 @@ import (
 	"github.com/m50/shinidex/pkg/web/session"
 )
 
+func AuthnMiddleware() echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			if !session.IsLoggedIn(c) {
+				return RenderView(c, http.StatusUnauthorized, Unauthorized())
+			}
+			return next(c)
+		}
+	}
+}
+
 func HeaderMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		if err := next(c); err != nil {
@@ -17,27 +28,25 @@ func HeaderMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		if c.Request().Header.Get("hx-request") != "true" {
 			return nil
 		}
-		user, err := session.GetAuthedUser(c)
-		if err != nil {
-			c.Logger().Warn(err)
-		}
+		user, _ := session.GetAuthedUser(c)
 		return AddView(c, Header(user))
 	}
 }
 
 func renderWrappedView(ctx echo.Context, t templ.Component) error {
-	user, err := session.GetAuthedUser(ctx)
-	if err != nil {
-		ctx.Logger().Warn(err)
-	}
+	user, _ := session.GetAuthedUser(ctx)
 	base := BaseLayout(user)
 	children := templ.WithChildren(ctx.Request().Context(), t)
 	return base.Render(children, ctx.Response().Writer)
 }
 
+func RenderErrorWithCode(ctx echo.Context, status int, err error) error {
+	return RenderView(ctx, status, Error(err))
+}
+
 func RenderError(ctx echo.Context, err error) error {
 	ctx.Logger().Error(err)
-	return RenderView(ctx, http.StatusInternalServerError, Error(err))
+	return RenderErrorWithCode(ctx, http.StatusInternalServerError, err)
 }
 
 func AddView(ctx echo.Context, t templ.Component) error {

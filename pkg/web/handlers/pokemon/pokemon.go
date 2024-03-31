@@ -13,14 +13,9 @@ import (
 func Router(e *echo.Echo) {
 	group := e.Group("/pokemon")
 
-	group.GET("/", home).Name = "pokemon-list"
-	group.GET("/list", list)
+	group.GET("", list).Name = "pokemon-list"
 	group.GET("/box/:box", box)
 	group.PATCH("/:pokemon", toggleCaught)
-}
-
-func home(c echo.Context) error {
-	return views.RenderView(c, http.StatusOK, Main())
 }
 
 func list(c echo.Context) error {
@@ -42,7 +37,7 @@ func box(c echo.Context) error {
 	if err != nil {
 		return views.RenderError(c, err)
 	}
-	return views.RenderView(c, http.StatusOK, Box(pageNum, pkmn, len(pkmn) == 30))
+	return views.RenderView(c, http.StatusOK, Box(pageNum, pkmn))
 }
 
 func toggleCaught(c echo.Context) error {
@@ -51,6 +46,7 @@ func toggleCaught(c echo.Context) error {
 	if err != nil {
 		return views.RenderError(c, err)
 	}
+
 	return views.RenderViews(c, http.StatusOK,
 		Pokemon(pkmn, true),
 		views.Info("Caught", fmt.Sprintf("You caught a %s!", pkmn.Name)),

@@ -17,26 +17,26 @@ func (db Database) Pokedexes() PokedexesDB {
 
 func (db PokedexesDB) FindByOwnerID(id string) ([]types.Pokedex, error) {
 	dexes := []types.Pokedex{}
-	err := db.conn.Select(dexes, "SELECT * FROM pokedexes WHERE owner_id = $1;", id)
+	err := db.conn.Select(&dexes, "SELECT * FROM pokedexes WHERE owner_id = $1 ORDER BY updated;", id)
 	return dexes, err
 }
 
 func (db PokedexesDB) FindByID(id string) (types.Pokedex, error) {
 	dex := types.Pokedex{}
-	err := db.conn.Get(dex, "SELECT * FROM pokedexes WHERE id = $1;", id)
+	err := db.conn.Get(&dex, "SELECT * FROM pokedexes WHERE id = $1;", id)
 	return dex, err
 }
 
-func (db PokedexesDB) Insert(p types.Pokedex) error {
+func (db PokedexesDB) Insert(p types.Pokedex) (string, error) {
 	q := `
-	INSERT INTO pokedexes (id, owner_id, config, created, updated)
-	VALUES (:id, :owner_id, :config, :created, :updated);
+	INSERT INTO pokedexes (id, name, owner_id, config, created, updated)
+	VALUES (:id, :name, :owner_id, :config, :created, :updated);
 	`
 	p.ID = generateId()
 	p.Created = time.Now().UTC().Unix()
 	p.Updated = time.Now().UTC().Unix()
 	_, err := db.conn.NamedExec(q, p)
-	return err
+	return p.ID, err
 }
 
 func (db PokedexesDB) Update(p types.Pokedex) error {

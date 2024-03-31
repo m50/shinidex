@@ -35,15 +35,14 @@ func Close(c echo.Context) error {
 		return err
 	}
 
-	sess.Options = &sessions.Options{
-		Path:     "/",
-		MaxAge:   0,
-		HttpOnly: true,
-	}
-
 	delete(sess.Values, "UserID")
 	sess.Save(c.Request(), c.Response())
 	return nil
+}
+
+func IsLoggedIn(c echo.Context) bool {
+	_, err := GetAuthedUser(c)
+	return err == nil
 }
 
 func GetAuthedUser(c echo.Context) (*types.User, error) {
@@ -67,7 +66,7 @@ func GetAuthedUser(c echo.Context) (*types.User, error) {
 	}
 	user, err := db.Users().FindByID(userID)
 	if err != nil {
-		return nil, err
+		return nil, ErrNotAuthed
 	}
 	c.Set("user", user)
 

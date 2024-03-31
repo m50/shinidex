@@ -2,7 +2,7 @@ package auth
 
 templ LoginForm() {
     <div class="flex justify-center p-4 h-full">
-    <form hx-post="/auth/login" class="flex gap-4 flex-col w-96 p-4 rounded-xl" hx-target="#app" hx-swap="innerHTML" hx-replace-url="true">
+    <form hx-post="/auth/login" class="flex gap-4 flex-col w-96 p-4 rounded-xl" hx-target="#app" hx-swap="innerHTML" hx-push-url="true">
         <span class="flex justify-center mb-8"><h3 class="text-5xl">Login</h3></span>
         <div class="flex flex-col">
             <label class="block text-xl" for="email" class="">Email:</label>
@@ -13,6 +13,7 @@ templ LoginForm() {
                     rounded-xl focus:ring-blue-500 focus:border-blue-500 p-2.5
                     block text-slate-300 bg-slate-700 appearance-none border border-slate-600
                 "
+                tabindex="1"
                 placeholder="test@example.com"
                 required="true"
             />
@@ -20,7 +21,7 @@ templ LoginForm() {
         <div class="flex flex-col">
             <span class="flex justify-between">
                 <label class="block text-xl" for="password">Password:</label>
-                <a class="text-slate-500 underline hover:text-indigo-500" href="">Forgot your password?</a>
+                <a tabindex="5" class="text-slate-500 underline hover:text-indigo-500" href="">Forgot your password?</a>
             </span>
             <input
                 name="password"
@@ -31,11 +32,12 @@ templ LoginForm() {
                     block text-slate-300 bg-slate-700 appearance-none border border-slate-600
                 "
                 required="true"
+                tabindex="2"
             />
         </div>
-        <button type="submit" class="bg-indigo-500 rounded-xl py-2 px-4 flex-none text-xl mt-4">Login</button>
+        <button tabindex="3" type="submit" class="bg-indigo-500 rounded-xl py-2 px-4 flex-none text-xl mt-4">Login</button>
         <span class="flex justify-center gap-2">
-        Don't have an account? <a class="text-slate-500 underline hover:text-indigo-500" href="/auth/register">Sign up</a>
+        Don't have an account? <a tabindex="4" class="text-slate-500 underline hover:text-indigo-500" href="/auth/register">Sign up</a>
         </span>
     </form>
     </div>
