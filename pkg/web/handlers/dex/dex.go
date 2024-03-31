@@ -33,7 +33,6 @@ func list(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	c.Logger().Info(dexes)
 	return views.RenderView(c, http.StatusOK, List(dexes))
 }
 
