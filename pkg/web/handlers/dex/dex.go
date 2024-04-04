@@ -10,10 +10,11 @@ import (
 	"github.com/m50/shinidex/pkg/views"
 	"github.com/m50/shinidex/pkg/web/form"
 	"github.com/m50/shinidex/pkg/web/session"
+	"github.com/m50/shinidex/pkg/web/middleware"
 )
 
 func Router(e *echo.Echo) {
-	g := e.Group("/dex", views.AuthnMiddleware())
+	g := e.Group("/dex", middleware.AuthnMiddleware, middleware.AuthzMiddleware)
 
 	g.GET("", list)
 	g.GET("/new", new)

@@ -9,30 +9,6 @@ import (
 	"github.com/m50/shinidex/pkg/web/session"
 )
 
-func AuthnMiddleware() echo.MiddlewareFunc {
-	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			if !session.IsLoggedIn(c) {
-				return RenderView(c, http.StatusUnauthorized, Unauthorized())
-			}
-			return next(c)
-		}
-	}
-}
-
-func HeaderMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		if err := next(c); err != nil {
-			return err
-		}
-		if c.Request().Header.Get("hx-request") != "true" {
-			return nil
-		}
-		user, _ := session.GetAuthedUser(c)
-		return AddView(c, Header(user))
-	}
-}
-
 func renderWrappedView(ctx echo.Context, t templ.Component) error {
 	user, _ := session.GetAuthedUser(ctx)
 	base := BaseLayout(user)

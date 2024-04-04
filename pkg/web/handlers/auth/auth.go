@@ -9,6 +9,7 @@ import (
 	"github.com/m50/shinidex/pkg/database/passwords"
 	"github.com/m50/shinidex/pkg/views"
 	"github.com/m50/shinidex/pkg/web/session"
+	smiddleware "github.com/m50/shinidex/pkg/web/middleware"
 )
 
 func Router(e *echo.Echo) {
@@ -20,7 +21,7 @@ func Router(e *echo.Echo) {
 	group.GET("/login", loginForm)
 	group.POST("/login", login, middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
 
-	group.POST("/logout", logout, views.AuthnMiddleware())
+	group.POST("/logout", logout, smiddleware.AuthnMiddleware)
 }
 
 func registerForm(c echo.Context) error {
