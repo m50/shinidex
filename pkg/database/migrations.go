@@ -38,7 +38,7 @@ func (db *Database) Migrate(path string) error {
 		if res == 1 {
 			continue
 		}
-		fmt.Print("Migrating " + f.Name() + "...")
+		db.info("Migrating " + f.Name() + "...")
 
 		sql, err := os.ReadFile(path + "/" + f.Name())
 		if err != nil {
@@ -73,7 +73,6 @@ func (db *Database) Migrate(path string) error {
 			tx.Rollback()
 			return err
 		}
-		fmt.Println(" done")
 	}
 	tx.Commit()
 	return nil

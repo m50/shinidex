@@ -40,17 +40,10 @@ func router(e *echo.Echo) {
 	})
 }
 
-func logger() *log.Logger {
-	logger := log.New("shinidex")
-	logger.SetHeader("${time_rfc3339} ${level} ${short_file}:${line}")
-	logger.SetLevel(log.DEBUG)
-	return logger
-}
-
-func New(db *database.Database) *echo.Echo {
+func New(db *database.Database, logger *log.Logger) *echo.Echo {
 	e := echo.New()
 	e.HideBanner = true
-	e.Logger = logger()
+	e.Logger = logger
 
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
@@ -60,7 +53,7 @@ func New(db *database.Database) *echo.Echo {
 		}
 	})
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-		Format: "${time_rfc3339} \x1b[34mRQST\x1b[0m ${method} http://${host}${uri} : ${status} ${error}\n",
+		Format: "[${time_rfc3339}] \x1b[34mRQST\x1b[0m ${method} http://${host}${uri} : ${status} ${error}\n",
 	}))
 	e.Use(smiddleware.ErrorHandler)
 	e.Use(middleware.Recover())

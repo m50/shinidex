@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/labstack/gommon/log"
 	"github.com/m50/shinidex/pkg/types"
 	"github.com/stretchr/testify/assert"
 )
@@ -28,8 +29,10 @@ func TestGenerateIdSequential(t *testing.T) {
 
 func setupDB(t *testing.T) *Database {
 	d, _ := os.Getwd()
+	logger := log.New("test")
 	db, err := NewLocal(":memory:")
 	assert.Nil(t, err, "There is an error creating in memory database ", err)
+	db.AttachLogger(logger)
 	err = db.Migrate(d + "/../../migrations")
 	assert.Nil(t, err, "There is an error migrating ", err)
 

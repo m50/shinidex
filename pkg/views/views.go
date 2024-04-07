@@ -30,6 +30,7 @@ func AddView(ctx echo.Context, t templ.Component) error {
 }
 
 func RenderView(ctx echo.Context, status int, t templ.Component) error {
+	ctx.Response().WriteHeader(status)
 	ctx.Response().Writer.WriteHeader(status)
 	if ctx.Request().Header.Get("hx-request") != "true" {
 		return renderWrappedView(ctx, t)
@@ -38,6 +39,7 @@ func RenderView(ctx echo.Context, status int, t templ.Component) error {
 }
 
 func RenderViews(ctx echo.Context, status int, cmpts ...templ.Component) error {
+	ctx.Response().WriteHeader(status)
 	ctx.Response().Writer.WriteHeader(status)
 	var err error
 	for idx, cmpt := range cmpts {
