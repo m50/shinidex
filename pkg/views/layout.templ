@@ -41,20 +41,17 @@ templ Header(authedUser *types.User) {
 }
 
 templ empty() {
-	<div />
+	<div></div>
 }
 
 templ body() {
 	<main id="app" class="pt-8 flex-1 bg-slate-800 text-slate-200 w-full h-full flex justify-center">
-		<div class="flex flex-col px-4 lg:px-0 w-full">
-			{ children... }
-		</div>
+		{ children... }
 	</main>
 }
 
 templ notificationFeed() {
-	<div id="notification-feed" class="pointer-events-none fixed top-0 bottom-0 right-0 w-1/4 flex flex-col-reverse items-end gap-4 p-4">
-	</div>
+	<div id="notification-feed" class="pointer-events-none fixed top-0 bottom-0 right-0 w-1/4 flex flex-col-reverse items-end gap-4 p-4"></div>
 }
 
 // OOB Swap into a notification feed
@@ -78,36 +75,36 @@ templ Info(title string, body string) {
 
 templ NotFound() {
 	<div class="flex justify-center items-center h-full">
-	<div class="flex flex-col gap-8 items-center">
-		<span class="text-8xl">404</span>
-		<img class="mt-[-3rem]" src="https://img.pokemondb.net/sprites/home/shiny/luxio-f.png" alt="Luxio" />
-		<span class="text-3xl">Uh oh!</span>
-		<span class="text-2xl">Luxio could not find this page!</span>
-		<a class="text-slate-500 underline hover:text-indigo-500" href="/">Take me somewhere I belong</a>
-	</div>
+		<div class="flex flex-col gap-8 items-center">
+			<span class="text-8xl">404</span>
+			<img class="mt-[-3rem]" src="https://img.pokemondb.net/sprites/home/shiny/luxio-f.png" alt="Luxio"/>
+			<span class="text-3xl">Uh oh!</span>
+			<span class="text-2xl">Luxio could not find this page!</span>
+			<a class="text-slate-500 underline hover:text-indigo-500" href="/">Take me somewhere I belong</a>
+		</div>
 	</div>
 }
 
 templ Unauthorized() {
 	<div class="flex justify-center items-center h-full">
-	<div class="flex flex-col gap-8 items-center">
-		<span class="text-8xl">401</span>
-		<img class="mt-[-3rem]" src="https://img.pokemondb.net/sprites/home/shiny/kricketot-f.png" alt="Kricketot" />
-		<span class="text-3xl">Uh oh!</span>
-		<span class="text-2xl">Kriketot has found that you can't access this page!</span>
-		<a class="text-slate-500 underline hover:text-indigo-500" href="/">Take me somewhere I belong</a>
-	</div>
+		<div class="flex flex-col gap-8 items-center">
+			<span class="text-8xl">401</span>
+			<img class="mt-[-3rem]" src="https://img.pokemondb.net/sprites/home/shiny/kricketot-f.png" alt="Kricketot"/>
+			<span class="text-3xl">Uh oh!</span>
+			<span class="text-2xl">Kriketot has found that you can't access this page!</span>
+			<a class="text-slate-500 underline hover:text-indigo-500" href="/">Take me somewhere I belong</a>
+		</div>
 	</div>
 }
 
 templ Forbidden() {
 	<div class="flex justify-center items-center h-full">
-	<div class="flex flex-col gap-8 items-center">
-		<span class="text-8xl">403</span>
-		<img class="mt-[-3rem]" src="https://img.pokemondb.net/sprites/home/shiny/shinx-f.png" alt="Shinx" />
-		<span class="text-3xl">Uh oh!</span>
-		<span class="text-2xl">Shinx might try to zap you for accessing a page that doesn't belong to you!</span>
-		<a class="text-slate-500 underline hover:text-indigo-500" href="/">Take me somewhere I belong</a>
-	</div>
+		<div class="flex flex-col gap-8 items-center">
+			<span class="text-8xl">403</span>
+			<img class="mt-[-3rem]" src="https://img.pokemondb.net/sprites/home/shiny/shinx-f.png" alt="Shinx"/>
+			<span class="text-3xl">Uh oh!</span>
+			<span class="text-2xl">Shinx might try to zap you for accessing a page that doesn't belong to you!</span>
+			<a class="text-slate-500 underline hover:text-indigo-500" href="/">Take me somewhere I belong</a>
+		</div>
 	</div>
 }

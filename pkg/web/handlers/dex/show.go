@@ -19,14 +19,18 @@ func show(c echo.Context) error {
 }
 
 func toggleCaught(c echo.Context) error {
-	ctx := c.(database.DBContext)
-	pkmn, err := ctx.DB().Pokemon().FindByID(c.Param("pokemon"))
+	db := c.(database.DBContext).DB()
+	dex, err := db.Pokedexes().FindByID(c.Param("dex"))
+	if err != nil {
+		return views.RenderError(c, err)
+	}
+	pkmn, err := db.Pokemon().FindByID(c.Param("pokemon"))
 	if err != nil {
 		return views.RenderError(c, err)
 	}
 
 	return views.RenderViews(c, http.StatusOK,
-		Pokemon(pkmn, true),
+		Pokemon(dex, pkmn, true),
 		views.Info("Caught", fmt.Sprintf("You caught a %s!", pkmn.Name)),
 	)
 }

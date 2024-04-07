@@ -5,14 +5,31 @@ import (
 
 	"github.com/m50/shinidex/pkg/types"
 	"github.com/m50/shinidex/pkg/math"
-	"strings"
 )
 
+func shinyStr(s bool) string {
+	if s {
+		return "on"
+	}
+	return "off"
+}
+
 templ List(pokemon types.PokemonList, shiny bool) {
-	<div class="grid gap-4 grid-cols-6 p-4">
-		for i := 0; i < math.Ceil(float64(len(pokemon)) / 30); i++ {
-			@Box(i+1, pokemon.Box(i), shiny)
-		}
+	<div class="flex flex-col px-4 lg:px-0 w-full">
+		<div class="flex justify-center items-center h-16">
+			<button class="hover:text-indigo-500 cursor-pointer" hx-get={ fmt.Sprintf("/pokemon?shiny=%s", shinyStr(!shiny)) } hx-target="#app" hx-swap="innerHTML">
+				if shiny {
+					Switch to Normal
+				} else {
+					Switch to ✨ Shiny ✨
+				}
+			</button>
+		</div>
+		<div class="grid gap-4 grid-cols-6 p-4">
+			for i := 0; i < math.Ceil(float64(len(pokemon)) / 30); i++ {
+				@Box(i+1, pokemon.Box(i), shiny)
+			}
+		</div>
 	</div>
 }
 
@@ -60,28 +77,13 @@ templ Box(boxNum int, pokemon types.PokemonList, shiny bool) {
 	</div>
 }
 
-func sanitizeID(id string) string {
-	s, _ := strings.CutSuffix(id, "-antique")
-	s, _ = strings.CutSuffix(s, "-masterpiece")
-	s, _ = strings.CutSuffix(s, "-artisan")
-
-	return s
-}
-
-func shinyStr(s bool) string {
-	if s {
-		return "shiny"
-	}
-	return "normal"
-}
-
 templ Pokemon(pkmn types.Pokemon, shiny bool) {
 	<div
 		class="w-14 h-14 text-slate-800 hover:bg-indigo-300 flex justify-center items-center rounded-xl"
 		title={ pkmn.Name }
 	>
 		<img
-			src={ fmt.Sprintf("https://img.pokemondb.net/sprites/home/%s/%s.png", shinyStr(shiny), sanitizeID(pkmn.ID)) }
+			src={ pkmn.GetImageURL(shiny) }
 			alt={ pkmn.Name }
 		/>
 	</div>

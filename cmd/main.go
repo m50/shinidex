@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/gommon/log"
 	"github.com/m50/shinidex/pkg/database"
 	"github.com/m50/shinidex/pkg/database/passwords"
+	imgdownloader "github.com/m50/shinidex/pkg/img-downloader"
 	"github.com/m50/shinidex/pkg/types"
 	"github.com/m50/shinidex/pkg/web"
 )
@@ -40,6 +41,8 @@ func main() {
 	}
 
 	addTestUser(db, logger)
+
+	go imgdownloader.DownloadImages(db, logger)
 
 	e := web.New(db, logger)
 	if err := e.Start(":1323"); err != nil {

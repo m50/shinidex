@@ -11,6 +11,22 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func SetupDBWithLogger(t *testing.T, logger *log.Logger) *Database {
+	d, _ := os.Getwd()
+	db, err := NewLocal(":memory:")
+	assert.Nil(t, err, "There is an error creating in memory database ", err)
+	db.AttachLogger(logger)
+	err = db.Migrate(d + "/../../migrations")
+	assert.Nil(t, err, "There is an error migrating ", err)
+
+	return db
+}
+
+func SetupDB(t *testing.T) *Database {
+	logger := log.New("test")
+	return SetupDBWithLogger(t, logger)
+}
+
 func TestGenerateId(t *testing.T) {
 	t.Parallel()
 	id := generateId()
@@ -27,21 +43,9 @@ func TestGenerateIdSequential(t *testing.T) {
 	assert.True(t, sort.StringsAreSorted(ids), "Strings are not sorted")
 }
 
-func setupDB(t *testing.T) *Database {
-	d, _ := os.Getwd()
-	logger := log.New("test")
-	db, err := NewLocal(":memory:")
-	assert.Nil(t, err, "There is an error creating in memory database ", err)
-	db.AttachLogger(logger)
-	err = db.Migrate(d + "/../../migrations")
-	assert.Nil(t, err, "There is an error migrating ", err)
-
-	return db
-}
-
 func TestMigrate(t *testing.T) {
 	t.Parallel()
-	db := setupDB(t)
+	db := SetupDB(t)
 	defer db.Close()
 	c := 0
 	err := db.conn.Get(&c, "SELECT count(*) FROM migrations")
@@ -51,7 +55,7 @@ func TestMigrate(t *testing.T) {
 
 func TestUser(t *testing.T) {
 	t.Parallel()
-	db := setupDB(t)
+	db := SetupDB(t)
 	defer db.Close()
 	_, err := db.Users().Insert(types.User{
 		Email:    "test@test.com",
@@ -75,7 +79,7 @@ func TestUser(t *testing.T) {
 
 func TestPokemon(t *testing.T) {
 	t.Parallel()
-	db := setupDB(t)
+	db := SetupDB(t)
 	defer db.Close()
 
 	pkmn, err := db.Pokemon().GetAll()

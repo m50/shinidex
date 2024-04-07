@@ -3,6 +3,7 @@ package types
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/m50/shinidex/pkg/math"
@@ -87,7 +88,7 @@ func (p PokemonList) Forms() PokemonList {
 			if strings.Contains(pkmn.ID, "tapu-") {
 				continue
 			}
-			if pkmn.ID[len(pkmn.ID) - 2:] == "-o" {
+			if pkmn.ID[len(pkmn.ID)-2:] == "-o" {
 				continue
 			}
 			if pkmn.NationalDexNumber >= 984 && pkmn.NationalDexNumber <= 995 {
@@ -134,6 +135,39 @@ func (p Pokemon) Generation() Generation {
 	}
 
 	return UNKNOWN
+}
+
+func (p Pokemon) GetLocalImagePath(shiny bool) string {
+	id, _ := strings.CutSuffix(p.ID, "-antique")
+	id, _ = strings.CutSuffix(id, "-masterpiece")
+	id, _ = strings.CutSuffix(id, "-artisan")
+	shinyStr := "normal"
+	if shiny {
+		shinyStr = "shiny"
+	}
+
+	workingDir, _ := os.Getwd()
+	localFile := fmt.Sprintf("/assets/imgs/%s/%s.png", shinyStr, id)
+
+	return workingDir + localFile
+}
+
+func (p Pokemon) GetImageURL(shiny bool) string {
+	id, _ := strings.CutSuffix(p.ID, "-antique")
+	id, _ = strings.CutSuffix(id, "-masterpiece")
+	id, _ = strings.CutSuffix(id, "-artisan")
+	shinyStr := "normal"
+	if shiny {
+		shinyStr = "shiny"
+	}
+
+	workingDir, _ := os.Getwd()
+	localFile := fmt.Sprintf("/assets/imgs/%s/%s.png", shinyStr, id)
+	if _, err := os.Stat(workingDir + localFile); err != nil {
+		return fmt.Sprintf("https://img.pokemondb.net/sprites/home/%s/%s.png", shinyStr, id)
+	}
+
+	return localFile
 }
 
 type PokemonForm struct {

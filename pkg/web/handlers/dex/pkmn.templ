@@ -3,11 +3,16 @@ package dex
 import "fmt"
 import "github.com/m50/shinidex/pkg/types"
 
-templ Pokemon(pkmn types.Pokemon, caught bool) {
+func getDexConfig(dex types.Pokedex) types.PokedexConfig {
+	c, _ := dex.GetConfig()
+	return c
+}
+
+templ Pokemon(dex types.Pokedex, pkmn types.Pokemon, caught bool) {
 	<div
 		class="w-14 h-14 text-slate-800 hover:bg-indigo-300 flex justify-center items-center rounded-xl"
 		title={ pkmn.Name }
-		hx-patch={ fmt.Sprintf("/pokemon/%s", pkmn.ID) }
+		hx-patch={ fmt.Sprintf("/dex/%s/pkmn/%s", dex.ID, pkmn.ID) }
 	>
 		<img
 			if caught {
@@ -15,7 +20,7 @@ templ Pokemon(pkmn types.Pokemon, caught bool) {
 			} else {
 				class="filter grayscale hover:filter-none"
 			}
-			src={ fmt.Sprintf("https://img.pokemondb.net/sprites/home/normal/%s.png", pkmn.ID) }
+			src={ pkmn.GetImageURL(getDexConfig(dex).Shiny) }
 			alt={ pkmn.Name }
 		/>
 	</div>
