@@ -12,6 +12,7 @@ import (
 )
 
 func SetupDBWithLogger(t *testing.T, logger *log.Logger) *Database {
+	t.Helper()
 	d, _ := os.Getwd()
 	db, err := NewLocal(":memory:")
 	assert.Nil(t, err, "There is an error creating in memory database ", err)
@@ -23,6 +24,7 @@ func SetupDBWithLogger(t *testing.T, logger *log.Logger) *Database {
 }
 
 func SetupDB(t *testing.T) *Database {
+	t.Helper()
 	logger := log.New("test")
 	return SetupDBWithLogger(t, logger)
 }
