@@ -32,7 +32,7 @@ func DownloadImages(db *database.Database, logger *log.Logger) {
 		go downloadPokemonImages(wg, pkmn, logger)
 		// only do 10 per 5 seconds
 		if idx % 10 == 0 {
-			<-time.After(1 * time.Second)
+			<-time.After(5 * time.Second)
 		}
 	}
 
