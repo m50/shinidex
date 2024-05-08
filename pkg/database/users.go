@@ -4,13 +4,11 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/labstack/gommon/log"
 	"github.com/m50/shinidex/pkg/types"
 )
 
 type UserDB struct {
 	conn *sqlx.DB
-	logger *log.Logger
 }
 
 func (db Database) Users() UserDB {

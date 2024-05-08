@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/m50/shinidex/pkg/logger"
 )
 
 const migrationSchema = `
@@ -38,7 +40,7 @@ func (db *Database) Migrate(path string) error {
 		if res == 1 {
 			continue
 		}
-		db.info("Migrating " + f.Name() + "...")
+		logger.Info("Migrating " + f.Name() + "...")
 
 		sql, err := os.ReadFile(path + "/" + f.Name())
 		if err != nil {

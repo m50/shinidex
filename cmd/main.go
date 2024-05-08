@@ -10,6 +10,7 @@ import (
 	imgdownloader "github.com/m50/shinidex/pkg/img-downloader"
 	"github.com/m50/shinidex/pkg/types"
 	"github.com/m50/shinidex/pkg/web"
+	l "github.com/m50/shinidex/pkg/logger"
 )
 
 func logger() *log.Logger {
@@ -27,6 +28,7 @@ func main() {
 	}
 
 	logger := logger()
+	l.SetDefaultLogger(logger)
 
 	db, err := database.NewFromEnv()
 	if err != nil {
@@ -34,7 +36,6 @@ func main() {
 		return
 	}
 	defer db.Close()
-	db.AttachLogger(logger)
 	if err = db.Migrate("./migrations"); err != nil {
 		logger.Fatalf("Failed to migrate: %s", err)
 		return

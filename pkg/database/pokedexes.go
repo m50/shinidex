@@ -4,13 +4,11 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/labstack/gommon/log"
 	"github.com/m50/shinidex/pkg/types"
 )
 
 type PokedexesDB struct {
 	conn *sqlx.DB
-	logger *log.Logger
 }
 
 func (db Database) Pokedexes() PokedexesDB {
@@ -61,7 +59,6 @@ func (db PokedexesDB) Delete(id string) error {
 
 type PokedexEntriesDB struct {
 	conn *sqlx.DB
-	logger *log.Logger
 }
 
 func (db PokedexesDB) Entries() PokedexEntriesDB {

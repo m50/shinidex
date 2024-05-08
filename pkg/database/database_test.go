@@ -9,24 +9,24 @@ import (
 	"github.com/labstack/gommon/log"
 	"github.com/m50/shinidex/pkg/types"
 	"github.com/stretchr/testify/assert"
+	l "github.com/m50/shinidex/pkg/logger"
 )
 
-func SetupDBWithLogger(t *testing.T, logger *log.Logger) *Database {
+func SetupDB(t *testing.T) *Database {
 	t.Helper()
 	d, _ := os.Getwd()
 	db, err := NewLocal(":memory:")
 	assert.Nil(t, err, "There is an error creating in memory database ", err)
-	db.AttachLogger(logger)
 	err = db.Migrate(d + "/../../migrations")
 	assert.Nil(t, err, "There is an error migrating ", err)
 
 	return db
 }
 
-func SetupDB(t *testing.T) *Database {
+func SetupDBWithLogger(t *testing.T, logger *log.Logger) *Database {
 	t.Helper()
-	logger := log.New("test")
-	return SetupDBWithLogger(t, logger)
+	l.SetDefaultLogger(logger)
+	return SetupDB(t)
 }
 
 func TestGenerateId(t *testing.T) {

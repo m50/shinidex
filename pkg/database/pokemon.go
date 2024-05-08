@@ -5,19 +5,16 @@ import (
 	"slices"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/labstack/gommon/log"
 	"github.com/m50/shinidex/pkg/math"
 	"github.com/m50/shinidex/pkg/types"
 )
 
 type PokemonDB struct {
 	conn *sqlx.DB
-	logger *log.Logger
 }
 
 type PokemonFormsDB struct {
 	conn *sqlx.DB
-	logger *log.Logger
 }
 
 func (db Database) Pokemon() PokemonDB {

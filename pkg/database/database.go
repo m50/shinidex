@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/labstack/gommon/log"
 	"github.com/tursodatabase/go-libsql"
 )
 
@@ -20,67 +19,6 @@ type DBContext interface {
 
 type Database struct {
 	conn *sqlx.DB
-	logger *log.Logger
-}
-
-func (db Database) debug(i ...interface{}) {
-	if db.logger == nil {
-		return
-	}
-	db.logger.Debug(i...)
-}
-
-func (db Database) debugf(msg string, i ...interface{}) {
-	if db.logger == nil {
-		return
-	}
-	db.logger.Debugf(msg, i...)
-}
-
-func (db Database) info(i ...interface{}) {
-	if db.logger == nil {
-		return
-	}
-	db.logger.Info(i...)
-}
-
-func (db Database) infof(msg string, i ...interface{}) {
-	if db.logger == nil {
-		return
-	}
-	db.logger.Infof(msg, i...)
-}
-
-func (db Database) warn(i ...interface{}) {
-	if db.logger == nil {
-		return
-	}
-	db.logger.Warn(i...)
-}
-
-func (db Database) warnf(msg string, i ...interface{}) {
-	if db.logger == nil {
-		return
-	}
-	db.logger.Warnf(msg, i...)
-}
-
-func (db Database) error(i ...interface{}) {
-	if db.logger == nil {
-		return
-	}
-	db.logger.Error(i...)
-}
-
-func (db Database) errorf(msg string, i ...interface{}) {
-	if db.logger == nil {
-		return
-	}
-	db.logger.Errorf(msg, i...)
-}
-
-func (db *Database) AttachLogger(logger *log.Logger) {
-	db.logger = logger
 }
 
 func NewFromEnv() (*Database, error) {
