@@ -111,6 +111,7 @@ type Pokemon struct {
 	NationalDexNumber int `db:"national_dex_number"`
 	Name              string
 	ShinyLocked       bool `db:"shiny_locked"`
+	Form              bool
 }
 
 func (p Pokemon) Generation() Generation {
@@ -138,7 +139,8 @@ func (p Pokemon) Generation() Generation {
 }
 
 func (p Pokemon) GetLocalImagePath(shiny bool) string {
-	id, _ := strings.CutSuffix(p.ID, "-antique")
+	id := strings.Replace(p.ID, "+", "-", 1)
+	id, _ = strings.CutSuffix(id, "-antique")
 	id, _ = strings.CutSuffix(id, "-masterpiece")
 	id, _ = strings.CutSuffix(id, "-artisan")
 	shinyStr := "normal"
@@ -153,7 +155,8 @@ func (p Pokemon) GetLocalImagePath(shiny bool) string {
 }
 
 func (p Pokemon) GetImageURL(shiny bool) string {
-	id, _ := strings.CutSuffix(p.ID, "-antique")
+	id := strings.Replace(p.ID, "+", "-", 1)
+	id, _ = strings.CutSuffix(id, "-antique")
 	id, _ = strings.CutSuffix(id, "-masterpiece")
 	id, _ = strings.CutSuffix(id, "-artisan")
 	shinyStr := "normal"

@@ -29,16 +29,7 @@ func AddView(ctx echo.Context, t templ.Component) error {
 	return t.Render(ctx.Request().Context(), ctx.Response().Writer)
 }
 
-func RenderView(ctx echo.Context, status int, t templ.Component) error {
-	ctx.Response().WriteHeader(status)
-	ctx.Response().Writer.WriteHeader(status)
-	if ctx.Request().Header.Get("hx-request") != "true" {
-		return renderWrappedView(ctx, t)
-	}
-	return AddView(ctx, t)
-}
-
-func RenderViews(ctx echo.Context, status int, cmpts ...templ.Component) error {
+func RenderView(ctx echo.Context, status int, cmpts ...templ.Component) error {
 	ctx.Response().WriteHeader(status)
 	ctx.Response().Writer.WriteHeader(status)
 	var err error

@@ -15,7 +15,7 @@ import (
 )
 
 func DownloadImages(db *database.Database, logger *log.Logger) {
-	pokemon, err := db.Pokemon().GetAllAsSeparatForms()
+	pokemon, err := db.Pokemon().GetAllAsSeparateForms()
 	if err != nil {
 		logger.Error("Failed to fetch pokemon images: ", err)
 		return
@@ -31,7 +31,7 @@ func DownloadImages(db *database.Database, logger *log.Logger) {
 		}
 		go downloadPokemonImages(wg, pkmn, logger)
 		// only do 10 per 5 seconds
-		if idx % 10 == 0 {
+		if idx%10 == 0 {
 			<-time.After(5 * time.Second)
 		}
 	}

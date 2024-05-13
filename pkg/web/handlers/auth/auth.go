@@ -8,8 +8,8 @@ import (
 	"github.com/m50/shinidex/pkg/database"
 	"github.com/m50/shinidex/pkg/database/passwords"
 	"github.com/m50/shinidex/pkg/views"
-	"github.com/m50/shinidex/pkg/web/session"
 	smiddleware "github.com/m50/shinidex/pkg/web/middleware"
+	"github.com/m50/shinidex/pkg/web/session"
 )
 
 func Router(e *echo.Echo) {
@@ -45,7 +45,7 @@ func login(c echo.Context) error {
 	}
 
 	if err := passwords.ComparePasswords(user.Password, c.FormValue("password")); err != nil {
-		return views.RenderViews(c, http.StatusForbidden, LoginForm(), views.Error(err))
+		return views.RenderView(c, http.StatusForbidden, LoginForm(), views.Error(err))
 	}
 
 	if err := session.New(c, user); err != nil {

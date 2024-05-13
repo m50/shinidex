@@ -78,6 +78,5 @@ func generateId() string {
 	randComponent = randComponent[start:]
 
 	id := timeComponent + randComponent
-	id = id[:32]
-	return id
+	return id[:32]
 }

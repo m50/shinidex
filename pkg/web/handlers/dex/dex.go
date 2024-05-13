@@ -9,8 +9,8 @@ import (
 	"github.com/m50/shinidex/pkg/types"
 	"github.com/m50/shinidex/pkg/views"
 	"github.com/m50/shinidex/pkg/web/form"
-	"github.com/m50/shinidex/pkg/web/session"
 	"github.com/m50/shinidex/pkg/web/middleware"
+	"github.com/m50/shinidex/pkg/web/session"
 )
 
 func Router(e *echo.Echo) {
@@ -68,9 +68,48 @@ func create(c echo.Context) error {
 }
 
 func update(c echo.Context) error {
-	return nil
+	var form struct {
+		id            string             `param:"dex"`
+		name          string             `form:"name"`
+		shiny         bool               `form:"shiny"`
+		forms         types.FormLocation `form:"forms"`
+		genderForms   types.FormLocation `form:"genderForms"`
+		regionalForms types.FormLocation `form:"regionalForms"`
+		gmaxForms     types.FormLocation `form:"gmaxForms"`
+	}
+	if err := c.Bind(form); err != nil {
+		return err
+	}
+
+	db := c.(database.DBContext).DB().Pokedexes()
+	dex, err := db.FindByID(form.id)
+	if err != nil {
+		return err
+	}
+	dex.Name = form.name
+	if err = dex.UpdateConfig(types.PokedexConfig{
+		Shiny:         form.shiny,
+		Forms:         form.forms,
+		GenderForms:   form.genderForms,
+		RegionalForms: form.regionalForms,
+		GMaxForms:     form.gmaxForms,
+	}); err != nil {
+		return err
+	}
+
+	if err = db.Update(dex); err != nil {
+		return err
+	}
+
+	return c.Redirect(http.StatusMovedPermanently, fmt.Sprintf("/dex/%s", form.id))
 }
 
 func delete(c echo.Context) error {
+	id := c.Param("dex")
+	db := c.(database.DBContext).DB().Pokedexes()
+	if err := db.Delete(id); err != nil {
+		return err
+	}
+
 	return c.Redirect(http.StatusMovedPermanently, "/dex/")
 }

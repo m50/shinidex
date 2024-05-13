@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 	"slices"
+	"strings"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/m50/shinidex/pkg/math"
@@ -62,7 +63,26 @@ func (db PokemonFormsDB) FindByID(pokemonID string, formID string) (types.Pokemo
 	return form, err
 }
 
-func (db PokemonDB) GetAllAsSeparatForms() (types.PokemonList, error) {
+func (db PokemonDB) FindByFullFormID(fullFormID string) (types.Pokemon, error) {
+	parts := strings.Split(fullFormID, "+")
+	pkmn, err := db.FindByID(parts[0])
+	if err != nil || len(parts) == 1 {
+		return pkmn, err
+	}
+	f, err := db.Forms().FindByID(parts[0], parts[1])
+	if err != nil {
+		return types.Pokemon{}, err
+	}
+	return types.Pokemon{
+		ID:                pkmn.ID + "+" + f.ID,
+		Name:              fmt.Sprintf("%s (%s)", pkmn.Name, f.Name),
+		NationalDexNumber: pkmn.NationalDexNumber,
+		ShinyLocked:       f.ShinyLocked,
+		Form:              true,
+	}, nil
+}
+
+func (db PokemonDB) GetAllAsSeparateForms() (types.PokemonList, error) {
 	pokemon, err := db.GetAll()
 	if err != nil {
 		return nil, err
@@ -82,10 +102,11 @@ func (db PokemonDB) GetAllAsSeparatForms() (types.PokemonList, error) {
 			}
 			c++
 			result[c] = types.Pokemon{
-				ID:                pkmn.ID + "-" + f.ID,
+				ID:                pkmn.ID + "+" + f.ID,
 				Name:              fmt.Sprintf("%s (%s)", pkmn.Name, f.Name),
 				NationalDexNumber: pkmn.NationalDexNumber,
 				ShinyLocked:       f.ShinyLocked,
+				Form:              true,
 			}
 		}
 	}

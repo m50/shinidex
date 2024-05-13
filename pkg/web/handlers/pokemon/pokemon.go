@@ -19,7 +19,7 @@ func Router(e *echo.Echo) {
 
 func list(c echo.Context) error {
 	ctx := c.(database.DBContext)
-	pkmn, err := ctx.DB().Pokemon().GetAllAsSeparatForms()
+	pkmn, err := ctx.DB().Pokemon().GetAllAsSeparateForms()
 	if err != nil {
 		return views.RenderError(c, err)
 	}
@@ -34,7 +34,7 @@ func box(c echo.Context) error {
 		return views.RenderError(c, err)
 	}
 	// pkmn, err := ctx.DB().Pokemon().Get(30, pageNum)
-	pkmn, err := ctx.DB().Pokemon().GetAllAsSeparatForms()
+	pkmn, err := ctx.DB().Pokemon().GetAllAsSeparateForms()
 	pkmn = pkmn.Box(pageNum - 1)
 	if err != nil {
 		return views.RenderError(c, err)

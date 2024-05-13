@@ -5,19 +5,13 @@ import (
 
 	"github.com/m50/shinidex/pkg/types"
 	"github.com/m50/shinidex/pkg/math"
+	"github.com/m50/shinidex/pkg/web/form"
 )
-
-func shinyStr(s bool) string {
-	if s {
-		return "on"
-	}
-	return "off"
-}
 
 templ List(pokemon types.PokemonList, shiny bool) {
 	<div class="flex flex-col px-4 lg:px-0 w-full">
 		<div class="flex justify-center items-center h-16">
-			<button class="hover:text-indigo-500 cursor-pointer" hx-get={ fmt.Sprintf("/pokemon?shiny=%s", shinyStr(!shiny)) } hx-target="#app" hx-swap="innerHTML">
+			<button class="hover:text-indigo-500 cursor-pointer" hx-get={ fmt.Sprintf("/pokemon?shiny=%s", form.BoolToString(!shiny)) } hx-target="#app" hx-swap="innerHTML">
 				if shiny {
 					Switch to Normal
 				} else {

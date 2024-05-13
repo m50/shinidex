@@ -1,55 +1,71 @@
 package dex
 
-import "github.com/m50/shinidex/pkg/types"
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/m50/shinidex/pkg/types"
+	"github.com/m50/shinidex/pkg/math"
+)
 
 templ List(dexes []types.Pokedex) {
 	<div class="flex justify-center">
-	<div class="flex flex-col w-1/2 gap-6">
-		<h2 class="text-6xl flex justify-center">Living Dexes</h2>
-		<div class="flex justify-center">
-			<button hx-get="/dex/new" hx-target="#app" hx-push-url="true" class="bg-indigo-500 rounded-xl py-2 px-4 flex-none text-xl mt-4">
-			Add Living Dex
-			</button>
-		</div>
-		<div class="grid gap-2 grid-cols-4">
-			for _, dex := range dexes {
-				if cfg, err := dex.GetConfig(); err == nil {
-					<div
-						hx-get={ string(templ.URL(fmt.Sprintf("/dex/%s", dex.ID))) }
-						hx-push-url="true"
-						hx-target="#app"
-						class="
+		<div class="flex flex-col w-1/2 gap-6">
+			<h2 class="text-6xl flex justify-center">Living Dexes</h2>
+			<div class="flex justify-center">
+				<button hx-get="/dex/new" hx-target="#app" hx-push-url="true" class="bg-indigo-500 rounded-xl py-2 px-4 flex-none text-xl mt-4">
+					Add Living Dex
+				</button>
+			</div>
+			<div class="grid gap-2 grid-cols-4">
+				for _, dex := range dexes {
+					if cfg, err := dex.GetConfig(); err == nil {
+						<div
+							hx-get={ string(templ.URL(fmt.Sprintf("/dex/%s", dex.ID))) }
+							hx-push-url="true"
+							hx-target="#app"
+							class="
 							flex flex-col items-center gap-2 rounded-xl
 							bg-slate-700 border border-slate-600 p-2
 							cursor-pointer hover:bg-indigo-700
 						"
-					>
-						<div class="text-5xl">
-							if cfg.Shiny {
-								<span>✨</span>
-							}
-							<span>{ dex.Name }</span>
-							if cfg.Shiny {
-								<span>✨</span>
-							}
+						>
+							<div class="text-3xl text-center">
+								if cfg.Shiny {
+									<span>✨</span>
+								}
+								<br/>
+								<span>{ dex.Name }</span>
+								<br/>
+								if cfg.Shiny {
+									<span>✨</span>
+								}
+							</div>
+							<div class="flex flex-col items-center">
+								<span class="font-bold">Gender Forms</span>
+								<span>{ cfg.GenderForms.ToString() }</span>
+							</div>
+							<div class="flex flex-col items-center">
+								<span class="font-bold">Regional Forms</span>
+								<span>{ cfg.RegionalForms.ToString() }</span>
+							</div>
+							<div class="flex flex-col items-center">
+								<span class="font-bold">Gigantamax Forms</span>
+								<span>{ cfg.GMaxForms.ToString() }</span>
+							</div>
 						</div>
-						<div class="flex flex-col items-center">
-							<span class="font-bold">Gender Forms</span>
-							<span>{ cfg.GenderForms.ToString() }</span>
-						</div>
-						<div class="flex flex-col items-center">
-							<span class="font-bold">Regional Forms</span>
-							<span>{ cfg.RegionalForms.ToString() }</span>
-						</div>
-						<div class="flex flex-col items-center">
-							<span class="font-bold">Gigantamax Forms</span>
-							<span>{ cfg.GMaxForms.ToString() }</span>
-						</div>
-					</div>
+					}
 				}
-			}
+			</div>
 		</div>
 	</div>
+}
+
+templ Display(pokemon types.PokemonList, dex types.Pokedex) {
+	<div class="flex flex-col px-4 lg:px-0 w-full">
+		<div class="grid gap-4 grid-cols-1 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 p-4">
+			for i := 0; i < math.Ceil(float64(len(pokemon)) / 30); i++ {
+				@Box(dex, i+1, pokemon.Box(i))
+			}
+		</div>
 	</div>
 }

@@ -1,6 +1,9 @@
 package form
 
-import "strconv"
+import (
+	"strconv"
+)
+
 
 func ParseInt(v string) int {
 	r, err := strconv.Atoi(v)
