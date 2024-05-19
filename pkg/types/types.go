@@ -112,6 +112,17 @@ type Pokemon struct {
 	Name              string
 	ShinyLocked       bool `db:"shiny_locked"`
 	Form              bool
+	Caught            bool
+}
+
+func (p Pokemon) IDParts() (pokemonID, formID string) {
+	parts := strings.Split(p.ID, "+")
+	pokemonID = parts[0]
+	if len(parts) > 1 {
+		formID = parts[1]
+	}
+
+	return
 }
 
 func (p Pokemon) Generation() Generation {

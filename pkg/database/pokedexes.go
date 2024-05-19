@@ -1,6 +1,7 @@
 package database
 
 import (
+	"errors"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -65,29 +66,7 @@ func (db PokedexesDB) Entries() PokedexEntriesDB {
 	return PokedexEntriesDB(db)
 }
 
-func (db PokedexEntriesDB) Catch(pokedexID, pokemonID string) error {
-	q := `
-	INSERT INTO pokedex_entries (pokedex_id, pokemon_id, form_id, created, updated)
-	VALUES (:pokedex_id, :pokemon_id, NULL, :created, :updated);
-	`
-	entry := types.PokedexEntry{
-		PokedexID: pokedexID,
-		PokemonID: pokemonID,
-		Created:   time.Now().UTC().Unix(),
-		Updated:   time.Now().UTC().Unix(),
-	}
-
-	_, err := db.conn.NamedExec(q, entry)
-	return err
-}
-
-func (db PokedexEntriesDB) Release(pokedexID, pokemonID string) error {
-	q := `DELETE FROM pokedex_entries WHERE pokedex_id = $1, pokemon_id = $2;`
-	_, err := db.conn.Exec(q, pokedexID, pokemonID)
-	return err
-}
-
-func (db PokedexEntriesDB) CatchForm(pokedexID, pokemonID, formID string) error {
+func (db PokedexEntriesDB) Catch(pokedexID, pokemonID, formID string) error {
 	q := `
 	INSERT INTO pokedex_entries (pokedex_id, pokemon_id, form_id, created, updated)
 	VALUES (:pokedex_id, :pokemon_id, :form_id, :created, :updated);
@@ -100,12 +79,28 @@ func (db PokedexEntriesDB) CatchForm(pokedexID, pokemonID, formID string) error 
 		Updated:   time.Now().UTC().Unix(),
 	}
 
-	_, err := db.conn.NamedExec(q, entry)
+	r, err := db.conn.NamedExec(q, entry)
+	if err != nil {
+		return err
+	}
+	i, err := r.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if i < 1 {
+		return errors.New("no rows inserted")
+	}
+	return nil
+}
+
+func (db PokedexEntriesDB) Release(pokedexID, pokemonID, formID string) error {
+	q := `DELETE FROM pokedex_entries WHERE pokedex_id = $1 AND pokemon_id = $2 AND form_id = $3;`
+	_, err := db.conn.Exec(q, pokedexID, pokemonID, formID)
 	return err
 }
 
-func (db PokedexesDB) ReleaseForm(pokedexID, pokemonID, formID string) error {
-	q := `DELETE FROM pokedex_entries WHERE pokedex_id = $1, pokemon_id = $2, form_id = $3;`
-	_, err := db.conn.Exec(q, pokedexID, pokemonID, formID)
-	return err
+func (db PokedexEntriesDB) List(pokedexID string) ([]types.PokedexEntry, error) {
+	entries := []types.PokedexEntry{}
+	err := db.conn.Select(&entries, "SELECT * FROM pokedex_entries WHERE pokedex_id = $1", pokedexID)
+	return entries, err
 }

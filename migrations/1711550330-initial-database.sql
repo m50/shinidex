@@ -37,10 +37,10 @@ CREATE TABLE pokedexes (
 CREATE TABLE pokedex_entries (
 	pokedex_id TEXT NOT NULL,
 	pokemon_id TEXT NOT NULL,
-	form_id TEXT,
+	form_id TEXT NOT NULL,
 	created DATETIME NOT NULL,
 	updated DATETIME NOT NULL,
 	FOREIGN KEY(pokedex_id) REFERENCES pokedexes(id) ON DELETE CASCADE,
-	FOREIGN KEY(pokemon_id) REFERENCES pokemon(id)
-	CONSTRAINT pokemon_entry_id_cstrt PRIMARY KEY (pokedex_id, pokemon_id)
+	FOREIGN KEY(pokemon_id) REFERENCES pokemon(id),
+	CONSTRAINT pokemon_entry_id_cstrt PRIMARY KEY (pokedex_id, pokemon_id, form_id)
 );

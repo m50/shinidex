@@ -21,12 +21,13 @@ func DownloadImages(db *database.Database, logger *log.Logger) {
 		return
 	}
 
-	logger.Info("Preparing download of pokemon images...")
+	logger.Info("[img-downloader] Preparing download of pokemon images...")
 	wg := &sync.WaitGroup{}
 	wg.Add(len(pokemon))
 	for idx, pkmn := range pokemon {
 		pkmn := pkmn
 		if !strings.Contains(pkmn.GetImageURL(false), "https://") {
+			wg.Done()
 			continue
 		}
 		go downloadPokemonImages(wg, pkmn, logger)
@@ -37,28 +38,30 @@ func DownloadImages(db *database.Database, logger *log.Logger) {
 	}
 
 	wg.Wait()
+
+	logger.Info("[img-downloader] Done")
 }
 
 func downloadPokemonImages(wg *sync.WaitGroup, pkmn types.Pokemon, logger *log.Logger) {
 	// First get normal image
-	logger.Debugf("Downloading normal image for %s...", pkmn.ID)
+	logger.Debugf("[img-downloader] Downloading normal image for %s...", pkmn.ID)
 	localPath := pkmn.GetLocalImagePath(false)
 	foreignPath := pkmn.GetImageURL(false)
 	if err := fetchImage(foreignPath, localPath); err != nil {
-		logger.Errorf("Unable to fetch normal local image for pokemon [%s]: %s", pkmn.ID, err)
+		logger.Errorf("[img-downloader] Unable to fetch normal local image for pokemon [%s]: %s", pkmn.ID, err)
 		wg.Done()
 	}
-	logger.Infof("Downloaded normal image for %s", pkmn.ID)
+	logger.Infof("[img-downloader] Downloaded normal image for %s", pkmn.ID)
 
 	// Now get shiny
-	logger.Debugf("Downloading shiny image for %s...", pkmn.ID)
+	logger.Debugf("[img-downloader] Downloading shiny image for %s...", pkmn.ID)
 	localPath = pkmn.GetLocalImagePath(true)
 	foreignPath = pkmn.GetImageURL(true)
 	if err := fetchImage(foreignPath, localPath); err != nil {
-		logger.Errorf("Unable to fetch shiny local image for pokemon [%s]: %s", pkmn.ID, err)
+		logger.Errorf("[img-downloader] Unable to fetch shiny local image for pokemon [%s]: %s", pkmn.ID, err)
 		wg.Done()
 	}
-	logger.Infof("Downloaded shiny image for %s", pkmn.ID)
+	logger.Infof("[img-downloader] Downloaded shiny image for %s", pkmn.ID)
 
 	// Done
 	wg.Done()

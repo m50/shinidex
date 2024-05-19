@@ -8,7 +8,7 @@ templ Box(dex types.Pokedex, boxNum int, pokemon types.PokemonList) {
 		<div class="bg-indigo-100 grid grid-cols-6 rounded-b-xl p-2 justify-center items-center">
 			for i := 0; i < 30; i++ {
 				if len(pokemon) > i {
-					@Pokemon(dex, pokemon[i], false)
+					@Pokemon(dex, pokemon[i])
 				} else {
 					<div class="w-14 h-14">&nbsp;</div>
 				}
@@ -17,19 +17,24 @@ templ Box(dex types.Pokedex, boxNum int, pokemon types.PokemonList) {
 	</div>
 }
 
-templ Pokemon(dex types.Pokedex, pkmn types.Pokemon, caught bool) {
+templ Pokemon(dex types.Pokedex, pkmn types.Pokemon) {
 	if c, err := dex.GetConfig(); err == nil {
 		<div
 			class="w-14 h-14 text-slate-800 hover:bg-indigo-300 flex justify-center items-center rounded-xl"
 			title={ pkmn.Name }
-			if c.Shiny && !pkmn.ShinyLocked {
+			if !pkmn.Caught && c.Shiny && !pkmn.ShinyLocked {
 				hx-patch={ fmt.Sprintf("/dex/%s/pkmn/%s", dex.ID, pkmn.ID) }
 			}
+			if pkmn.Caught {
+				hx-delete={ fmt.Sprintf("/dex/%s/pkmn/%s", dex.ID, pkmn.ID) }
+			}
+			hx-swap="outerHTML"
 		>
 			<img
-				if caught {
+				if pkmn.Caught {
 					class=""
-				} else if c.Shiny && pkmn.ShinyLocked {
+				}
+				if c.Shiny && pkmn.ShinyLocked {
 					class="filter grayscale brightness-0"
 				} else {
 					class="filter grayscale hover:grayscale-[50%]"
