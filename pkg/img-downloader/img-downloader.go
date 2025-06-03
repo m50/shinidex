@@ -67,8 +67,10 @@ func downloadPokemonImages(wg *sync.WaitGroup, pkmn types.Pokemon, logger *log.L
 	wg.Done()
 }
 
+var httpGet = http.Get
+
 func fetchImage(foreignPath, localPath string) error {
-	resp, err := http.Get(foreignPath)
+	resp, err := httpGet(foreignPath)
 	if err != nil {
 		return err
 	}

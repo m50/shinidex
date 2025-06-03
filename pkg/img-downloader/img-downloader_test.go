@@ -1,7 +1,10 @@
 package imgdownloader
 
 import (
+	"io"
+	"net/http"
 	"os"
+	"strings"
 	"sync"
 	"testing"
 
@@ -23,6 +26,17 @@ func TestDownloadPokemonImages(t *testing.T) {
 	}
 
 	if !assert.Contains(t, pkmn.GetImageURL(false), "https://") || !assert.Contains(t, pkmn.GetImageURL(true), "https://") {
+		return
+	}
+
+	o := false
+	httpGet = func(url string) (resp *http.Response, err error) {
+		resp = &http.Response{}
+		assert.Equal(t, pkmn.GetImageURL(o), url)
+		o = true
+		resp.Status = "200 OK"
+		resp.StatusCode = 200
+		resp.Body = io.NopCloser(strings.NewReader("test"))
 		return
 	}
 
