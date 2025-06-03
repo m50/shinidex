@@ -1,10 +1,11 @@
 package database
 
 import (
+	crand "crypto/rand"
 	"database/sql"
 	"database/sql/driver"
 	"fmt"
-	"math/rand"
+	"math/big"
 	"os"
 	"strconv"
 	"time"
@@ -69,14 +70,15 @@ func generateId() string {
 
 	randComponent := ""
 	for i := 0; i < 5; i++ {
-		r := rand.Uint64()
-		randComponent += strconv.FormatUint(r, 36)
+		k, _ := crand.Int(crand.Reader, big.NewInt(now))
+		r := k.Int64()
+		randComponent += strconv.FormatInt(r, 36)
 	}
-
+	
 	max := len(randComponent) - (32 - len(timeComponent))
-	start := rand.Intn(max)
-	randComponent = randComponent[start:]
-
+	start, _ := crand.Int(crand.Reader, big.NewInt(int64(max)))
+	randComponent = randComponent[start.Int64():]
+	
 	id := timeComponent + randComponent
 	return id[:32]
 }
