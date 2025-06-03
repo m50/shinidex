@@ -5,6 +5,7 @@ export default {
     './**/*.templ',
     './frontend/*.ts',
     './frontend/**/*.ts',
+    '!./node_modules/**/*',
   ],
   theme: {
     extend: {},

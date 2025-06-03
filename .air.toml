@@ -25,7 +25,7 @@ tmp_dir = "tmp"
     "kill $(ps | grep shinidex | grep main | awk '{print $1}')"
   ]
   pre_cmd = [
-    "templ generate",
+    "go generate ./...",
     "bunx tailwindcss -i ./frontend/src/input.css -o ./assets/style.css",
     "bun build --target=\"browser\" --outfile ./assets/scripts.js ./frontend/src/index.ts"
   ]
