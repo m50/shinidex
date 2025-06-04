@@ -5,6 +5,9 @@ import "github.com/m50/shinidex/pkg/types"
 
 templ Box(dex types.Pokedex, boxNum int, pokemon types.PokemonList) {
 	<div id={ fmt.Sprintf("box-%d", boxNum) } class="rounded-xl border border-indigo-800">
+		<span class="rounded-t-xl bg-indigo-500 w-full flex justify-between h-8 text-xl">
+			<span class="rounded-t-xl h-full bg-indigo-100 px-8 text-slate-800">Box { fmt.Sprint(boxNum) }</span>
+		</span>
 		<div class="bg-indigo-100 grid grid-cols-6 rounded-b-xl p-2 justify-center items-center">
 			for i := 0; i < 30; i++ {
 				if len(pokemon) > i {

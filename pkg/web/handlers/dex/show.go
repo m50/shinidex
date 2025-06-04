@@ -24,6 +24,10 @@ func show(c echo.Context) error {
 	if err != nil {
 		return views.RenderError(c, err)
 	}
+	cfg, err := dex.GetConfig()
+	if err != nil {
+		return views.RenderError(c, err)
+	}
 	pokemon, err := db.Pokemon().GetAllAsSeparateForms()
 	if err != nil {
 		return views.RenderError(c, err)
@@ -33,17 +37,49 @@ func show(c echo.Context) error {
 		return views.RenderError(c, err)
 	}
 
-	for i, pkmn := range pokemon {
+	filteredPokemon := slices.Clone(pokemon)
+	filteredPokemon = slices.DeleteFunc(filteredPokemon, func(pkmn types.Pokemon) bool {
+		if !pkmn.Form {
+			return false
+		}
+		return (!cfg.Forms.AfterBaseForm() && pkmn.IsStandardForm()) ||
+			(!cfg.GMaxForms.AfterBaseForm() && pkmn.IsGMax()) ||
+			(!cfg.RegionalForms.AfterBaseForm() && pkmn.IsRegional()) ||
+			(!cfg.GenderForms.AfterBaseForm() && pkmn.IsFemale())
+	})
+	afterPokemon := types.PokemonList{}
+	if cfg.Forms.Separate() {
+		afterPokemon = append(afterPokemon, pokemon.StandardForms()...)
+	}
+	if cfg.GMaxForms.Separate() {
+		afterPokemon = append(afterPokemon, pokemon.GMax()...)
+	}
+	if cfg.GenderForms.Separate() {
+		afterPokemon = append(afterPokemon, pokemon.Female()...)
+	}
+	if cfg.RegionalForms.Separate() {
+		afterPokemon = append(afterPokemon, pokemon.Regional()...)
+	}
+	slices.SortStableFunc(afterPokemon, func(pkmnA, pkmnB types.Pokemon) int {
+		if pkmnA.NationalDexNumber < pkmnB.NationalDexNumber {
+			return -1
+		} else if pkmnA.NationalDexNumber > pkmnB.NationalDexNumber {
+			return 1
+		}
+		return 0
+	})
+
+	for i, pkmn := range filteredPokemon {
 		idx := slices.IndexFunc(entries, func(e types.PokedexEntry) bool {
 			pkmnID, formID := pkmn.IDParts()
 			return e.PokemonID == pkmnID && e.FormID == formID
 		})
 		if idx >= 0 {
-			pokemon[i].Caught = true
+			filteredPokemon[i].Caught = true
 		}
 	}
 
-	return views.RenderView(c, http.StatusOK, Display(pokemon, dex))
+	return views.RenderView(c, http.StatusOK, Display([]types.PokemonList{filteredPokemon, afterPokemon}, dex))
 }
 
 func catch(c echo.Context) error {

@@ -32,71 +32,30 @@ templ New() {
                 "
 				/>
 			</div>
-			<div class="flex flex-col">
-				<label class="block text-xl" for="forms">Forms:</label>
-				<select
-					required="true"
-					name="forms"
-					id="forms"
-					class="
-					rounded-xl focus:ring-blue-500 focus:border-blue-500 p-2.5
-					block text-slate-300 bg-slate-700 border border-slate-600
-				"
-				>
-					<option value={ types.Off.Value() } selected="true">{ types.Off.ToString() }</option>
-					<option value={ types.After.Value() }>{ types.After.ToString() }</option>
-					<option value={ types.Separate.Value() }>{ types.Separate.ToString() }</option>
-				</select>
-			</div>
-			<div class="flex flex-col">
-				<label class="block text-xl" for="gender">Gender Forms:</label>
-				<select
-					required="true"
-					name="gender"
-					id="gender"
-					class="
-					rounded-xl focus:ring-blue-500 focus:border-blue-500 p-2.5
-					block text-slate-300 bg-slate-700 border border-slate-600
-				"
-				>
-					<option value={ types.Off.Value() } selected="true">{ types.Off.ToString() }</option>
-					<option value={ types.After.Value() }>{ types.After.ToString() }</option>
-					<option value={ types.Separate.Value() }>{ types.Separate.ToString() }</option>
-				</select>
-			</div>
-			<div class="flex flex-col">
-				<label class="block text-xl" for="regional">Regional Forms:</label>
-				<select
-					required="true"
-					name="regional"
-					id="regional"
-					class="
-					rounded-xl focus:ring-blue-500 focus:border-blue-500 p-2.5
-					block text-slate-300 bg-slate-700 border border-slate-600
-				"
-				>
-					<option value={ types.Off.Value() } selected="true">{ types.Off.ToString() }</option>
-					<option value={ types.After.Value() }>{ types.After.ToString() }</option>
-					<option value={ types.Separate.Value() }>{ types.Separate.ToString() }</option>
-				</select>
-			</div>
-			<div class="flex flex-col">
-				<label class="block text-xl" for="gmax">Gigantamax Forms:</label>
-				<select
-					required="true"
-					name="gmax"
-					id="gmax"
-					class="
-					rounded-xl focus:ring-blue-500 focus:border-blue-500 p-2.5
-					block text-slate-300 bg-slate-700 border border-slate-600
-				"
-				>
-					<option value={ types.Off.Value() } selected="true">{ types.Off.ToString() }</option>
-					<option value={ types.After.Value() }>{ types.After.ToString() }</option>
-					<option value={ types.Separate.Value() }>{ types.Separate.ToString() }</option>
-				</select>
-			</div>
+			@selector("Forms", "forms")
+			@selector("Gender Forms", "gender")
+			@selector("Regional Forms", "regional")	
+			@selector("Gigantamax Forms", "gmax")	
 			<button type="submit" class="bg-indigo-500 rounded-xl py-2 px-4 flex-none text-xl mt-4">Create</button>
 		</form>
+	</div>
+}
+
+templ selector(label, id string) {
+	<div class="flex flex-col">
+		<label class="block text-xl" for={ id }>{ label }:</label>
+		<select
+			required="true"
+			name={ id }
+			id={ id }
+			class="
+			rounded-xl focus:ring-blue-500 focus:border-blue-500 p-2.5
+			block text-slate-300 bg-slate-700 border border-slate-600
+		"
+		>
+			<option value={ types.Off.Value() } selected="true">{ types.Off.String() }</option>
+			<option value={ types.After.Value() }>{ types.After.String() }</option>
+			<option value={ types.Separate.Value() }>{ types.Separate.String() }</option>
+		</select>
 	</div>
 }

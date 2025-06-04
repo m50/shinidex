@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/m50/shinidex/pkg/math"
@@ -41,69 +42,27 @@ func (p PokemonList) Box(i int) PokemonList {
 }
 
 func (p PokemonList) GMax() PokemonList {
-	r := PokemonList{}
-	for _, pkmn := range p {
-		if strings.Contains(pkmn.ID, "gigantamax") {
-			r = append(r, pkmn)
-		}
-	}
-	return r
+	return slices.DeleteFunc(slices.Clone(p), func(pkmn Pokemon) bool {
+		return !pkmn.IsGMax()
+	})
 }
 
 func (p PokemonList) Female() PokemonList {
-	r := PokemonList{}
-	for _, pkmn := range p {
-		if pkmn.ID[len(pkmn.ID)-1:] == "f" {
-			r = append(r, pkmn)
-		} else if strings.Contains(pkmn.ID, "female") {
-			r = append(r, pkmn)
-		}
-	}
-	return r
+	return slices.DeleteFunc(slices.Clone(p), func(pkmn Pokemon) bool {
+		return !pkmn.IsFemale()
+	})
 }
 
 func (p PokemonList) Regional() PokemonList {
-	r := PokemonList{}
-	for _, pkmn := range p {
-		if strings.Contains(pkmn.ID, "alolan") {
-			r = append(r, pkmn)
-		} else if strings.Contains(pkmn.ID, "galarian") {
-			r = append(r, pkmn)
-		} else if strings.Contains(pkmn.ID, "paldean") {
-			r = append(r, pkmn)
-		} else if strings.Contains(pkmn.ID, "hisuian") {
-			r = append(r, pkmn)
-		}
-	}
-	return r
+	return slices.DeleteFunc(slices.Clone(p), func(pkmn Pokemon) bool {
+		return !pkmn.IsRegional()
+	})
 }
 
-func (p PokemonList) Forms() PokemonList {
-	r := PokemonList{}
-	for _, pkmn := range p {
-		if strings.Contains(pkmn.ID, "-") {
-			if pkmn.ID == "porygon-z" || pkmn.ID == "mime-jr" || pkmn.ID == "mr-mime" {
-				continue
-			}
-			if strings.Contains(pkmn.ID, "tapu-") {
-				continue
-			}
-			if pkmn.ID[len(pkmn.ID)-2:] == "-o" {
-				continue
-			}
-			if pkmn.NationalDexNumber >= 984 && pkmn.NationalDexNumber <= 995 {
-				continue
-			}
-			if pkmn.NationalDexNumber >= 1001 && pkmn.NationalDexNumber <= 1010 {
-				continue
-			}
-			if pkmn.NationalDexNumber >= 1020 && pkmn.NationalDexNumber <= 1023 {
-				continue
-			}
-			r = append(r, pkmn)
-		}
-	}
-	return r
+func (p PokemonList) StandardForms() PokemonList {
+	return slices.DeleteFunc(slices.Clone(p), func(pkmn Pokemon) bool {
+		return !pkmn.IsStandardForm()
+	})
 }
 
 type Pokemon struct {
@@ -123,6 +82,31 @@ func (p Pokemon) IDParts() (pokemonID, formID string) {
 	}
 
 	return
+}
+
+func (p Pokemon) IsGMax() bool {
+	_, formID := p.IDParts()
+	return strings.Contains(formID, "gigantamax")
+}
+
+func (p Pokemon) IsFemale() bool {
+	_, formID := p.IDParts()
+	return formID == "f" || strings.Contains(formID, "female")
+}
+
+func (p Pokemon) IsRegional() bool {
+	_, formID := p.IDParts()
+	return strings.Contains(formID, "alolan") ||
+		strings.Contains(formID, "galarian") ||
+		strings.Contains(formID, "paldean") ||
+		strings.Contains(formID, "hisuian")
+}
+
+func (p Pokemon) IsStandardForm() bool {
+	if p.IsFemale() || p.IsGMax() || p.IsRegional() {
+		return false
+	}
+	return strings.Contains(p.ID, "+")
 }
 
 func (p Pokemon) Generation() Generation {
@@ -223,14 +207,26 @@ const (
 func (f FormLocation) Value() string {
 	return fmt.Sprint(f)
 }
-func (f FormLocation) ToString() string {
+func (f FormLocation) String() string {
 	if f == Off {
 		return "Off"
 	} else if f == After {
-		return "After base form"
+		return "With base form"
 	} else {
-		return "Separate"
+		return "After Pokedex"
 	}
+}
+
+func (f FormLocation) Off() bool {
+	return f == Off
+}
+
+func (f FormLocation) AfterBaseForm() bool {
+	return f == After
+}
+
+func (f FormLocation) Separate() bool {
+	return f == Separate
 }
 
 type PokedexConfig struct {

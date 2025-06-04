@@ -42,15 +42,15 @@ templ List(dexes []types.Pokedex) {
 							</div>
 							<div class="flex flex-col items-center">
 								<span class="font-bold">Gender Forms</span>
-								<span>{ cfg.GenderForms.ToString() }</span>
+								<span>{ cfg.GenderForms.String() }</span>
 							</div>
 							<div class="flex flex-col items-center">
 								<span class="font-bold">Regional Forms</span>
-								<span>{ cfg.RegionalForms.ToString() }</span>
+								<span>{ cfg.RegionalForms.String() }</span>
 							</div>
 							<div class="flex flex-col items-center">
 								<span class="font-bold">Gigantamax Forms</span>
-								<span>{ cfg.GMaxForms.ToString() }</span>
+								<span>{ cfg.GMaxForms.String() }</span>
 							</div>
 						</div>
 					}
@@ -60,12 +60,14 @@ templ List(dexes []types.Pokedex) {
 	</div>
 }
 
-templ Display(pokemon types.PokemonList, dex types.Pokedex) {
+templ Display(pokemonLists []types.PokemonList, dex types.Pokedex) {
 	<div class="flex flex-col px-4 lg:px-0 w-full">
 		<div class="grid gap-4 grid-cols-1 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 p-4">
+		for _, pokemon := range pokemonLists {
 			for i := 0; i < math.Ceil(float64(len(pokemon)) / 30); i++ {
 				@Box(dex, i+1, pokemon.Box(i))
 			}
+		}
 		</div>
 	</div>
 }
