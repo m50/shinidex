@@ -1,47 +1,75 @@
 package dex
 
-import "github.com/m50/shinidex/pkg/types"
+import (
+	"fmt"
+
+	"github.com/m50/shinidex/pkg/types"
+)
 
 templ New() {
+	@EditDex(types.Pokedex{}, types.PokedexConfig{})
+}
+
+templ EditDex(dex types.Pokedex, cfg types.PokedexConfig) {
 	<div class="flex justify-center p-4 h-full">
-		<form hx-post="/dex" class="flex gap-4 flex-col w-96 p-4 rounded-xl" hx-target="#app" hx-swap="innerHTML" hx-push-url="true">
-			<span class="flex justify-center mb-8"><h3 class="text-5xl">New Living Dex</h3></span>
+		<form
+			if dex.Name == "" {
+				hx-post="/dex"
+			} else {
+				hx-put={ fmt.Sprintf("/dex/%s", dex.ID) }
+			}
+			class="flex gap-4 flex-col w-96 p-4 rounded-xl" hx-target="#app" hx-swap="innerHTML" hx-push-url="true"
+		>
+			<span class="flex justify-center mb-8">
+				<h3 class="text-5xl">
+					if dex.Name == "" {
+						New Living Dex
+					} else {
+						Edit Living Dex
+					}
+				</h3>
+			</span>
 			<div class="flex flex-col">
 				<label class="block text-xl" for="name">Name:</label>
 				<input
 					name="name"
 					id="name"
-					class="
-                    rounded-xl focus:ring-blue-500 focus:border-blue-500 p-2.5
-                    block text-slate-300 bg-slate-700 border border-slate-600
-                "
+					class="rounded-xl focus:ring-blue-500 focus:border-blue-500 p-2.5
+						block text-slate-300 bg-slate-700 border border-slate-600"
 					placeholder="Home Shiny Dex"
 					required="true"
+					value={ dex.Name }
 				/>
 			</div>
 			<div class="flex gap-2 h-6 items-center">
 				<label class="block text-xl" for="shiny">Shiny:</label>
 				<input
 					type="checkbox"
-					required="true"
 					name="shiny"
 					id="shiny"
-					class="
-                    rounded focus:ring-blue-500 focus:border-blue-500 w-4 h-4
-                    text-indigo-600 bg-slate-700 border border-slate-600
-                "
+					class="rounded focus:ring-blue-500 focus:border-blue-500 w-4 h-4
+						text-indigo-600 bg-slate-700 border border-slate-600"
+					if cfg.Shiny {
+						checked
+					}
 				/>
 			</div>
-			@selector("Forms", "forms")
-			@selector("Gender Forms", "gender")
-			@selector("Regional Forms", "regional")	
-			@selector("Gigantamax Forms", "gmax")	
-			<button type="submit" class="bg-indigo-500 rounded-xl py-2 px-4 flex-none text-xl mt-4">Create</button>
+			@formLocationSelector("Forms", "forms", cfg.Forms)
+			@formLocationSelector("Gender Forms", "gender", cfg.GenderForms)
+			@formLocationSelector("Regional Forms", "regional", cfg.RegionalForms)	
+			@formLocationSelector("Gigantamax Forms", "gmax", cfg.GMaxForms)	
+			<button type="submit" class="bg-indigo-500 rounded-xl py-2 px-4 flex-none text-xl mt-4">
+				if dex.Name == "" {
+					Create
+				} else {
+					Update
+				}
+			</button>
 		</form>
 	</div>
 }
 
-templ selector(label, id string) {
+templ formLocationSelector(label, id string, curVal types.FormLocation) {
 	<div class="flex flex-col">
 		<label class="block text-xl" for={ id }>{ label }:</label>
 		<select
@@ -53,9 +81,9 @@ templ selector(label, id string) {
 			block text-slate-300 bg-slate-700 border border-slate-600
 		"
 		>
-			<option value={ types.Off.Value() } selected="true">{ types.Off.String() }</option>
-			<option value={ types.After.Value() }>{ types.After.String() }</option>
-			<option value={ types.Separate.Value() }>{ types.Separate.String() }</option>
+			<option value={ types.Off.Value() } { curVal.Selected(types.Off) } >{ types.Off.String() }</option>
+			<option value={ types.After.Value() } { curVal.Selected(types.After) }>{ types.After.String() }</option>
+			<option value={ types.Separate.Value() } { curVal.Selected(types.Separate) }>{ types.Separate.String() }</option>
 		</select>
 	</div>
 }

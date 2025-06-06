@@ -14,6 +14,7 @@ import (
 
 func showRouter(g *echo.Group) {
 	g.GET("/:dex", show)
+	g.PATCH("/:dex/box", boxCatch)
 	g.PATCH("/:dex/pkmn/:pkmn", catch)
 	g.DELETE("/:dex/pkmn/:pkmn", release)
 }
@@ -69,17 +70,57 @@ func show(c echo.Context) error {
 		return 0
 	})
 
-	for i, pkmn := range filteredPokemon {
-		idx := slices.IndexFunc(entries, func(e types.PokedexEntry) bool {
-			pkmnID, formID := pkmn.IDParts()
-			return e.PokemonID == pkmnID && e.FormID == formID
-		})
-		if idx >= 0 {
-			filteredPokemon[i].Caught = true
+	lists := []types.PokemonList{filteredPokemon, afterPokemon}
+	for _, list := range lists {
+		for i, pkmn := range list {
+			idx := slices.IndexFunc(entries, func(e types.PokedexEntry) bool {
+				pkmnID, formID := pkmn.IDParts()
+				return e.PokemonID == pkmnID && e.FormID == formID
+			})
+			if idx >= 0 {
+				list[i].Caught = true
+			}
 		}
 	}
 
-	return views.RenderView(c, http.StatusOK, Display([]types.PokemonList{filteredPokemon, afterPokemon}, dex))
+	return views.RenderView(c, http.StatusOK, Display(lists, dex))
+}
+
+func boxCatch(c echo.Context) error {
+	db := c.(database.DBContext).DB()
+	dex, err := db.Pokedexes().FindByID(c.Param("dex"))
+	if err != nil {
+		return err
+	}
+	f := struct {
+		Box  int      `json:"box" form:"box"`
+		PKMN []string `json:"pkmn" form:"pkmn"`
+	}{}
+	if err := c.Bind(&f); err != nil {
+		return err
+	}
+
+	pkmnList := make(types.PokemonList, len(f.PKMN))
+	for idx := range f.PKMN {
+		pkmn, err := db.Pokemon().FindByFullFormID(f.PKMN[idx])
+		if err != nil {
+			return err
+		}
+
+		pkmnID, formID := pkmn.IDParts()
+		if err = db.Pokedexes().Entries().Catch(dex.ID, pkmnID, formID); err != nil {
+			logger.Error(f.PKMN[idx], ": ", err, "; likely already marked as caught")
+		} else {
+			logger.Infof("%s: caught for dex %s", pkmn.ID, dex.ID)
+		}
+		pkmn.Caught = true
+		pkmnList[idx] = pkmn
+	}
+
+	return views.RenderView(c, http.StatusOK, 
+		Box(dex, f.Box, pkmnList),
+		views.Info("Caught", fmt.Sprintf("You caught everything in box %d! Impressive!", f.Box)),
+	)
 }
 
 func catch(c echo.Context) error {
@@ -94,7 +135,6 @@ func catch(c echo.Context) error {
 	}
 
 	pkmnID, formID := pkmn.IDParts()
-	logger.Debug(pkmnID, " ", formID)
 	if err = db.Pokedexes().Entries().Catch(dex.ID, pkmnID, formID); err != nil {
 		return err
 	}

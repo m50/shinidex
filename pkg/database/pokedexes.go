@@ -67,10 +67,9 @@ func (db PokedexesDB) Entries() PokedexEntriesDB {
 }
 
 func (db PokedexEntriesDB) Catch(pokedexID, pokemonID, formID string) error {
-	q := `
-	INSERT INTO pokedex_entries (pokedex_id, pokemon_id, form_id, created, updated)
-	VALUES (:pokedex_id, :pokemon_id, :form_id, :created, :updated);
-	`
+	q := `INSERT INTO pokedex_entries (pokedex_id, pokemon_id, form_id, created, updated)
+	VALUES (:pokedex_id, :pokemon_id, :form_id, :created, :updated)`
+
 	entry := types.PokedexEntry{
 		PokedexID: pokedexID,
 		PokemonID: pokemonID,

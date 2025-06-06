@@ -1,12 +1,21 @@
 package dex
 
 import "fmt"
+import "encoding/json"
 import "github.com/m50/shinidex/pkg/types"
 
 templ Box(dex types.Pokedex, boxNum int, pokemon types.PokemonList) {
+	{{ jsonVals, _ := json.Marshal(map[string]interface{}{"box": boxNum, "pkmn": pokemon.IDs()}) }}
 	<div id={ fmt.Sprintf("box-%d", boxNum) } class="rounded-xl border border-indigo-800">
 		<span class="rounded-t-xl bg-indigo-500 w-full flex justify-between h-8 text-xl">
 			<span class="rounded-t-xl h-full bg-indigo-100 px-8 text-slate-800">Box { fmt.Sprint(boxNum) }</span>
+			<span class="rounded-t-xl h-full bg-indigo-100 px-8 text-slate-800"
+				hx-patch={ fmt.Sprintf("/dex/%s/box", dex.ID) } 
+				hx-swap="outerHTML" hx-target={ fmt.Sprintf("#box-%d", boxNum) }
+				hx-vals={ string(jsonVals) }
+			>
+				Catch
+			</span>
 		</span>
 		<div class="bg-indigo-100 grid grid-cols-6 rounded-b-xl p-2 justify-center items-center">
 			for i := 0; i < 30; i++ {
@@ -25,7 +34,7 @@ templ Pokemon(dex types.Pokedex, pkmn types.Pokemon) {
 		<div
 			class="w-14 h-14 text-slate-800 hover:bg-indigo-300 flex justify-center items-center rounded-xl"
 			title={ pkmn.Name }
-			if !pkmn.Caught && c.Shiny && !pkmn.ShinyLocked {
+			if !pkmn.Caught && ((c.Shiny && !pkmn.ShinyLocked) || !c.Shiny) {
 				hx-patch={ fmt.Sprintf("/dex/%s/pkmn/%s", dex.ID, pkmn.ID) }
 			}
 			if pkmn.Caught {

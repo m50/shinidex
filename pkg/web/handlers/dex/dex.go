@@ -6,6 +6,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/m50/shinidex/pkg/database"
+	"github.com/m50/shinidex/pkg/logger"
 	"github.com/m50/shinidex/pkg/types"
 	"github.com/m50/shinidex/pkg/views"
 	"github.com/m50/shinidex/pkg/web/form"
@@ -18,6 +19,7 @@ func Router(e *echo.Echo) {
 
 	g.GET("", list)
 	g.GET("/new", new)
+	g.GET("/:dex/edit", edit)
 	g.POST("", create)
 	g.PUT("/:dex", update)
 	g.DELETE("/:dex", delete)
@@ -64,35 +66,53 @@ func create(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+
+	logger.Infof("created dex %s [%s]", dex.ID, dex.Name)
 	return c.Redirect(http.StatusMovedPermanently, fmt.Sprintf("/dex/%s", id))
+}
+
+func edit(c echo.Context) error {
+	id := c.Param("dex")
+	db := c.(database.DBContext).DB().Pokedexes()
+	dex, err := db.FindByID(id)
+	if err != nil {
+		return err
+	}
+
+	cfg, err := dex.GetConfig()
+	if err != nil {
+		return err
+	}
+
+	return views.RenderView(c, http.StatusOK, EditDex(dex, cfg))
 }
 
 func update(c echo.Context) error {
 	var form struct {
-		id            string             `param:"dex"`
-		name          string             `form:"name"`
-		shiny         bool               `form:"shiny"`
-		forms         types.FormLocation `form:"forms"`
-		genderForms   types.FormLocation `form:"genderForms"`
-		regionalForms types.FormLocation `form:"regionalForms"`
-		gmaxForms     types.FormLocation `form:"gmaxForms"`
+		ID            string             `param:"dex"`
+		Name          string             `form:"name"`
+		Shiny         bool               `form:"shiny"`
+		Forms         types.FormLocation `form:"forms"`
+		GenderForms   types.FormLocation `form:"gender"`
+		RegionalForms types.FormLocation `form:"regional"`
+		GMaxForms     types.FormLocation `form:"gmax"`
 	}
-	if err := c.Bind(form); err != nil {
+	if err := c.Bind(&form); err != nil {
 		return err
 	}
 
 	db := c.(database.DBContext).DB().Pokedexes()
-	dex, err := db.FindByID(form.id)
+	dex, err := db.FindByID(form.ID)
 	if err != nil {
 		return err
 	}
-	dex.Name = form.name
+	dex.Name = form.Name
 	if err = dex.UpdateConfig(types.PokedexConfig{
-		Shiny:         form.shiny,
-		Forms:         form.forms,
-		GenderForms:   form.genderForms,
-		RegionalForms: form.regionalForms,
-		GMaxForms:     form.gmaxForms,
+		Shiny:         form.Shiny,
+		Forms:         form.Forms,
+		GenderForms:   form.GenderForms,
+		RegionalForms: form.RegionalForms,
+		GMaxForms:     form.GMaxForms,
 	}); err != nil {
 		return err
 	}
@@ -101,7 +121,8 @@ func update(c echo.Context) error {
 		return err
 	}
 
-	return c.Redirect(http.StatusMovedPermanently, fmt.Sprintf("/dex/%s", form.id))
+	logger.Infof("updated dex %s [%s]", dex.ID, dex.Name)
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/dex/%s", form.ID))
 }
 
 func delete(c echo.Context) error {
@@ -111,5 +132,6 @@ func delete(c echo.Context) error {
 		return err
 	}
 
-	return c.Redirect(http.StatusMovedPermanently, "/dex/")
+	logger.Infof("deleted dex %s", id)
+	return c.Redirect(http.StatusSeeOther, "/dex/")
 }

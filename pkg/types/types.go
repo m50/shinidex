@@ -41,6 +41,14 @@ func (p PokemonList) Box(i int) PokemonList {
 	return p[start:end]
 }
 
+func (p PokemonList) IDs() []string {
+	ids := make([]string, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return ids
+}
+
 func (p PokemonList) GMax() PokemonList {
 	return slices.DeleteFunc(slices.Clone(p), func(pkmn Pokemon) bool {
 		return !pkmn.IsGMax()
@@ -204,8 +212,15 @@ const (
 	Separate
 )
 
+func (f FormLocation) Selected(opt FormLocation) string {
+	if f == opt {
+		return "selected=\"true\""
+	}
+	return ""
+}
+
 func (f FormLocation) Value() string {
-	return fmt.Sprint(f)
+	return fmt.Sprintf("%d", f)
 }
 func (f FormLocation) String() string {
 	if f == Off {

@@ -19,7 +19,7 @@ templ List(pokemon types.PokemonList, shiny bool) {
 				}
 			</button>
 		</div>
-		<div class="grid gap-4 grid-cols-6 p-4">
+		<div class="grid gap-4 grid-cols-4 p-4">
 			for i := 0; i < math.Ceil(float64(len(pokemon)) / 30); i++ {
 				@Box(i+1, pokemon.Box(i), shiny)
 			}
