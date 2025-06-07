@@ -29,8 +29,7 @@ RUN apt-get update && apt-get install -y git gcc && rm -rf /var/lib/apt/lists/*
 COPY go.mod go.sum ./
 
 # Download dependencies
-RUN go mod download
-RUN go install github.com/a-h/templ/cmd/templ@latest
+RUN go mod download 
 
 # Copy source code
 COPY cmd/ ./cmd/

@@ -1,3 +1,3 @@
 package views
 
-//go:generate templ generate
+//go:generate go tool templ generate
