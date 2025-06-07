@@ -60,6 +60,9 @@ COPY --from=go-builder /app/migrations/ ./migrations/
 # Expose port (adjust if your app uses a different port)
 EXPOSE 1323
 
+# nonroot
+USER nonroot:nonroot
+
 # Run the binary
 CMD ["./main"]
 
