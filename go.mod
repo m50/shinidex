@@ -3,7 +3,7 @@ module github.com/m50/shinidex
 go 1.24.3
 
 require (
-	github.com/a-h/templ v0.3.887
+	github.com/a-h/templ v0.3.898
 	github.com/gorilla/sessions v1.2.2
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/joho/godotenv v1.5.1
