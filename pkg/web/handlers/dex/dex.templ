@@ -8,15 +8,15 @@ import (
 )
 
 templ List(dexes []types.Pokedex) {
-	<div class="flex justify-center">
-		<div class="flex flex-col gap-6">
+	<div class="flex justify-center w-full">
+		<div class="flex flex-col gap-6 w-2/3">
 			<h2 class="text-6xl flex justify-center">Living Dexes</h2>
 			<div class="flex justify-center">
 				<button hx-get="/dex/new" hx-target="#app" hx-push-url="true" class="bg-indigo-500 rounded-xl py-2 px-4 flex-none text-xl mt-4">
 					Add Living Dex
 				</button>
 			</div>
-			<div class="grid gap-2 grid-cols-3 w-100%">
+			<div class="grid gap-2 grid-cols-2 w-full">
 				for _, dex := range dexes {
 					if cfg, err := dex.GetConfig(); err == nil {
 						<div

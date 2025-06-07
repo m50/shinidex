@@ -88,31 +88,31 @@ func edit(c echo.Context) error {
 }
 
 func update(c echo.Context) error {
-	var form struct {
+	var f struct {
 		ID            string             `param:"dex"`
 		Name          string             `form:"name"`
-		Shiny         bool               `form:"shiny"`
+		Shiny         string             `form:"shiny"`
 		Forms         types.FormLocation `form:"forms"`
 		GenderForms   types.FormLocation `form:"gender"`
 		RegionalForms types.FormLocation `form:"regional"`
 		GMaxForms     types.FormLocation `form:"gmax"`
 	}
-	if err := c.Bind(&form); err != nil {
+	if err := c.Bind(&f); err != nil {
 		return err
 	}
 
 	db := c.(database.DBContext).DB().Pokedexes()
-	dex, err := db.FindByID(form.ID)
+	dex, err := db.FindByID(f.ID)
 	if err != nil {
 		return err
 	}
-	dex.Name = form.Name
+	dex.Name = f.Name
 	if err = dex.UpdateConfig(types.PokedexConfig{
-		Shiny:         form.Shiny,
-		Forms:         form.Forms,
-		GenderForms:   form.GenderForms,
-		RegionalForms: form.RegionalForms,
-		GMaxForms:     form.GMaxForms,
+		Shiny:         form.ParseBool(f.Shiny),
+		Forms:         f.Forms,
+		GenderForms:   f.GenderForms,
+		RegionalForms: f.RegionalForms,
+		GMaxForms:     f.GMaxForms,
 	}); err != nil {
 		return err
 	}
@@ -122,7 +122,7 @@ func update(c echo.Context) error {
 	}
 
 	logger.Infof("updated dex %s [%s]", dex.ID, dex.Name)
-	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/dex/%s", form.ID))
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/dex/%s", f.ID))
 }
 
 func delete(c echo.Context) error {

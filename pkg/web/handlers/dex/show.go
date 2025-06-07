@@ -113,7 +113,9 @@ func boxCatch(c echo.Context) error {
 		} else {
 			logger.Infof("%s: caught for dex %s", pkmn.ID, dex.ID)
 		}
-		pkmn.Caught = true
+		if !pkmn.ShinyLocked {
+			pkmn.Caught = true
+		}
 		pkmnList[idx] = pkmn
 	}
 
@@ -138,8 +140,10 @@ func catch(c echo.Context) error {
 	if err = db.Pokedexes().Entries().Catch(dex.ID, pkmnID, formID); err != nil {
 		return err
 	}
-	pkmn.Caught = true
-	logger.Infof("%s caught for dex %s", pkmn.ID, dex.ID)
+	if !pkmn.ShinyLocked {
+		pkmn.Caught = true
+		logger.Infof("%s caught for dex %s", pkmn.ID, dex.ID)
+	}
 
 	return views.RenderView(c, http.StatusOK,
 		Pokemon(dex, pkmn),

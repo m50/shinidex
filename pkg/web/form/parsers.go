@@ -2,6 +2,7 @@ package form
 
 import (
 	"strconv"
+	"strings"
 )
 
 
@@ -14,5 +15,5 @@ func ParseInt(v string) int {
 }
 
 func ParseBool(v string) bool {
-	return v == "on"
+	return strings.ToLower(v) == "on"
 }
