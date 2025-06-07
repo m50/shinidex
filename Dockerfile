@@ -30,6 +30,7 @@ COPY go.mod go.sum ./
 
 # Download dependencies
 RUN go mod download
+RUN go install github.com/a-h/templ/cmd/templ@latest
 
 # Copy source code
 COPY cmd/ ./cmd/
@@ -40,6 +41,7 @@ COPY migrations/ ./migrations/
 COPY --from=js-builder /app/assets/ ./assets/
 
 # Build the Go application
+RUN go generate ./...
 RUN CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -o main ./cmd/main.go
 
 # Final runtime stage with distroless (includes libgcc)
