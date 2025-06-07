@@ -27,8 +27,6 @@ tmp_dir = "tmp"
   pre_cmd = [
     "go generate ./...",
     "bun run build"
-    # "bunx tailwindcss -i ./frontend/src/input.css -o ./assets/style.css",
-    # "bun build --target=\"browser\" --outfile ./assets/scripts.js ./frontend/src/index.ts"
   ]
   rerun = false
   rerun_delay = 500
