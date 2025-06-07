@@ -49,7 +49,7 @@ templ Pokemon(dex types.Pokedex, pkmn types.Pokemon) {
 				if c.Shiny && pkmn.ShinyLocked {
 					class="filter grayscale brightness-0"
 				} else {
-					class="filter grayscale hover:grayscale-[50%]"
+					class="filter grayscale brightness-50 hover:brightness-100 hover:grayscale-[25%]"
 				}
 				src={ pkmn.GetImageURL(c.Shiny) }
 				alt={ pkmn.Name }
