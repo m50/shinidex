@@ -28,6 +28,7 @@ func (c Context) DB() *database.Database {
 
 func router(e *echo.Echo) {
 	e.Static("/assets", "assets")
+	e.Static("/icons", "icons")
 	e.GET("/", func(c echo.Context) error {
 		return c.Redirect(http.StatusMovedPermanently, e.Reverse("pokemon-list"))
 	})

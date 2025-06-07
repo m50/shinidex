@@ -12,6 +12,7 @@ templ BaseLayout(authedUser *types.User) {
 			<link rel="stylesheet" href="/assets/style.css"/>
 			<script src="/assets/scripts.js"></script>
 			<title>Shinidex</title>
+			@IconList()
 		</head>
 		<body class="min-h-screen flex flex-col">
 			@Header(authedUser)
@@ -24,20 +25,44 @@ templ BaseLayout(authedUser *types.User) {
 }
 
 templ Header(authedUser *types.User) {
-	<header hx-swap-oob="true" id="header" class="px-4 w-full flex gap-4 bg-indigo-500 text-slate-200 h-16 text-3xl justify-between items-center">
-		<span class="flex-none">Shinidex</span>
-		<div class="text-xl flex gap-4">
-			<a href="/pokemon" class="hover:text-indigo-400 flex-none">Pokémon</a>
-			if authedUser != nil {
-				<a href="/dex" class="hover:text-indigo-400 flex-none cursor-pointer">Pokédexes</a>
-				<a href={ templ.URL(fmt.Sprintf("/account/%s", authedUser.ID)) } class="hover:text-indigo-400 flex-none cursor-pointer">Account</a>
-				<a hx-push-url="true" hx-target="#app" hx-post="/auth/logout" class="hover:text-indigo-400 flex-none cursor-pointer">Logout</a>
-			} else {
-				<a href="/auth/login" class="hover:text-indigo-400 flex-none cursor-pointer">Login</a>
-				<a href="/auth/register" class="hover:text-indigo-400 flex-none cursor-pointer">Register</a>
-			}
-		</div>
+	<header hx-swap-oob="true" id="header" class="fixed px-4 w-full flex gap-4 bg-indigo-500 text-slate-200 h-16 text-3xl justify-between items-center">
+		<span class="flex-row flex justify-center items-center gap-2">
+			<span class="h-12 w-12">
+				@Icon()
+			</span>
+			Shinidex
+		</span>
+		<button type="button" id="navbar-button"
+			class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm bg-white
+				text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none 
+				focus:ring-2 focus:ring-gray-200"
+			aria-controls="navbar-default" aria-expanded="false">
+			<span class="sr-only">Open main menu</span>
+			<svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
+				<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+					d="M1 1h15M1 7h15M1 13h15" />
+			</svg>
+		</button>
+		<nav id="navbar-menu" class="hidden w-full md:w-auto md:flex flex-col md:flex-row text-2xl md:text-xl
+			top-16 left-0 right-0 h-auto bg-indigo-500 p-8 gap-8 absolute justify-center items-center rounded-b-xl
+			md:top-auto md:left-auto md:right-auto md:bottom-auto md:bg-transparent md:relative md:p-0 md:gap-4">
+			@links(authedUser)	
+		</nav>
 	</header>
+}
+
+templ links(authedUser *types.User) {
+	<a href="/pokemon" class="hover:text-indigo-400 flex-none">Pokémon</a>
+	if authedUser != nil {
+		<a href="/dex" class="hover:text-indigo-400 flex-none cursor-pointer">Pokédexes</a>
+		<a href={ templ.URL(fmt.Sprintf("/account/%s", authedUser.ID)) }
+			class="hover:text-indigo-400 flex-none cursor-pointer">Account</a>
+		<a hx-push-url="true" hx-target="#app" hx-post="/auth/logout"
+			class="hover:text-indigo-400 flex-none cursor-pointer">Logout</a>
+	} else {
+		<a href="/auth/login" class="hover:text-indigo-400 flex-none cursor-pointer">Login</a>
+		<a href="/auth/register" class="hover:text-indigo-400 flex-none cursor-pointer">Register</a>
+	}
 }
 
 templ empty() {
@@ -45,7 +70,7 @@ templ empty() {
 }
 
 templ body() {
-	<main id="app" class="pt-8 flex-1 bg-slate-800 text-slate-200 w-full h-full flex justify-center">
+	<main id="app" class="mt-16 pt-8 flex-1 bg-slate-800 text-slate-200 w-full h-full flex justify-center">
 		{ children... }
 	</main>
 }

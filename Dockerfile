@@ -37,6 +37,7 @@ WORKDIR /app
 COPY --from=go-builder /app/main ./
 COPY --from=js-builder /app/assets/ ./assets/
 COPY --from=go-builder /app/migrations/ ./migrations/
+COPY icons/ ./icons/
 
 EXPOSE 1323
 USER nonroot:nonroot
