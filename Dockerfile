@@ -1,4 +1,3 @@
-# Build stage for JavaScript/TypeScript with Bun
 FROM oven/bun:1 AS js-builder
 
 WORKDIR /app
@@ -24,9 +23,8 @@ RUN go mod download
 
 COPY cmd/ ./cmd/
 COPY pkg/ ./pkg/
-COPY migrations/ ./migrations/
 
-RUN go generate ./...
+RUN go generate pkg/...
 RUN CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -o main ./cmd/main.go
 
 FROM gcr.io/distroless/cc-debian12
@@ -35,7 +33,7 @@ WORKDIR /app
 
 COPY --from=go-builder /app/main ./
 COPY --from=js-builder /app/assets/ ./assets/
-COPY --from=go-builder /app/migrations/ ./migrations/
+COPY migrations/ ./migrations/
 COPY icons/ ./icons/
 
 EXPOSE 1323
