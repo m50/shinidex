@@ -37,7 +37,7 @@ func pkmnClasses(shiny bool, pkmn types.Pokemon) string {
 	if shiny && pkmn.ShinyLocked {
 		classes += " brightness-0"
 	} else {
-		classes += " brightness-50 hover:brightness-100 hover:grayscale-[25%]"
+		classes += " brightness-50 hover:brightness-100 hover:grayscale-25"
 	}
 	return classes
 }

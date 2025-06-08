@@ -34,7 +34,7 @@ templ Header(authedUser *types.User) {
 		</span>
 		<button type="button" id="navbar-button"
 			class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm bg-white
-				text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none 
+				text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-hidden 
 				focus:ring-2 focus:ring-gray-200"
 			aria-controls="navbar-default" aria-expanded="false">
 			<span class="sr-only">Open main menu</span>
@@ -102,7 +102,7 @@ templ NotFound() {
 	<div class="flex justify-center items-center h-full">
 		<div class="flex flex-col gap-8 items-center">
 			<span class="text-8xl">404</span>
-			<img class="mt-[-3rem]" src="https://img.pokemondb.net/sprites/home/shiny/luxio-f.png" alt="Luxio"/>
+			<img class="-mt-12" src="https://img.pokemondb.net/sprites/home/shiny/luxio-f.png" alt="Luxio"/>
 			<span class="text-3xl">Uh oh!</span>
 			<span class="text-2xl">Luxio could not find this page!</span>
 			<a class="text-slate-500 underline hover:text-indigo-500" href="/">Take me somewhere I belong</a>
@@ -114,7 +114,7 @@ templ Unauthorized() {
 	<div class="flex justify-center items-center h-full">
 		<div class="flex flex-col gap-8 items-center">
 			<span class="text-8xl">401</span>
-			<img class="mt-[-3rem]" src="https://img.pokemondb.net/sprites/home/shiny/kricketot-f.png" alt="Kricketot"/>
+			<img class="-mt-12" src="https://img.pokemondb.net/sprites/home/shiny/kricketot-f.png" alt="Kricketot"/>
 			<span class="text-3xl">Uh oh!</span>
 			<span class="text-2xl">Kriketot has found that you can't access this page!</span>
 			<a class="text-slate-500 underline hover:text-indigo-500" href="/">Take me somewhere I belong</a>
@@ -126,7 +126,7 @@ templ Forbidden() {
 	<div class="flex justify-center items-center h-full">
 		<div class="flex flex-col gap-8 items-center">
 			<span class="text-8xl">403</span>
-			<img class="mt-[-3rem]" src="https://img.pokemondb.net/sprites/home/shiny/shinx-f.png" alt="Shinx"/>
+			<img class="-mt-12" src="https://img.pokemondb.net/sprites/home/shiny/shinx-f.png" alt="Shinx"/>
 			<span class="text-3xl">Uh oh!</span>
 			<span class="text-2xl">Shinx might try to zap you for accessing a page that doesn't belong to you!</span>
 			<a class="text-slate-500 underline hover:text-indigo-500" href="/">Take me somewhere I belong</a>
