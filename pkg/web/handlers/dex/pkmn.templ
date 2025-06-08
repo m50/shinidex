@@ -29,6 +29,19 @@ templ Box(dex types.Pokedex, boxNum int, pokemon types.PokemonList) {
 	</div>
 }
 
+func pkmnClasses(shiny bool, pkmn types.Pokemon) string {
+	if pkmn.Caught {
+		return ""
+	}
+	classes := "filter z-10 relative grayscale"
+	if shiny && pkmn.ShinyLocked {
+		classes += " brightness-0"
+	} else {
+		classes += " brightness-50 hover:brightness-100 hover:grayscale-[25%]"
+	}
+	return classes
+}
+
 templ Pokemon(dex types.Pokedex, pkmn types.Pokemon) {
 	if c, err := dex.GetConfig(); err == nil {
 		<div
@@ -42,18 +55,7 @@ templ Pokemon(dex types.Pokedex, pkmn types.Pokemon) {
 			}
 			hx-swap="outerHTML"
 		>
-			<img
-				if pkmn.Caught {
-					class=""
-				}
-				if c.Shiny && pkmn.ShinyLocked {
-					class="filter grayscale brightness-0"
-				} else {
-					class="filter grayscale brightness-50 hover:brightness-100 hover:grayscale-[25%]"
-				}
-				src={ pkmn.GetImageURL(c.Shiny) }
-				alt={ pkmn.Name }
-			/>
+			<img class={ pkmnClasses(c.Shiny, pkmn) } src={ pkmn.GetImageURL(c.Shiny) } alt={ pkmn.Name } />
 		</div>
 	}
 }

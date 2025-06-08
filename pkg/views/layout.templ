@@ -25,7 +25,7 @@ templ BaseLayout(authedUser *types.User) {
 }
 
 templ Header(authedUser *types.User) {
-	<header hx-swap-oob="true" id="header" class="fixed px-4 w-full flex gap-4 bg-indigo-500 text-slate-200 h-16 text-3xl justify-between items-center">
+	<header hx-swap-oob="true" id="header" class="z-50 fixed px-4 w-full flex gap-4 bg-indigo-500 text-slate-200 h-16 text-3xl justify-between items-center">
 		<span class="flex-row flex justify-center items-center gap-2">
 			<span class="h-12 w-12">
 				@Icon()
