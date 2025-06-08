@@ -7,7 +7,6 @@ COPY package.json bun.lockb ./
 RUN bun install --frozen-lockfile
 
 COPY frontend/ ./frontend/
-COPY tailwind.config.js ./
 COPY pkg/ ./pkg
 
 RUN bun run build
