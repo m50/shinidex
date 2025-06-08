@@ -5,12 +5,13 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/gommon/log"
+	"github.com/m50/shinidex/pkg/config"
 	"github.com/m50/shinidex/pkg/database"
 	"github.com/m50/shinidex/pkg/database/passwords"
 	imgdownloader "github.com/m50/shinidex/pkg/img-downloader"
+	l "github.com/m50/shinidex/pkg/logger"
 	"github.com/m50/shinidex/pkg/types"
 	"github.com/m50/shinidex/pkg/web"
-	l "github.com/m50/shinidex/pkg/logger"
 )
 
 func logger() *log.Logger {
@@ -26,11 +27,14 @@ func main() {
 			log.Fatalf("error loading .env file: %s", err)
 		}
 	}
+	if err := config.LoadConfigFromEnv(); err != nil {
+		log.Fatal(err)
+	}
 
 	logger := logger()
 	l.SetDefaultLogger(logger)
 
-	db, err := database.NewFromEnv()
+	db, err := database.NewFromLoadedConfig()
 	if err != nil {
 		logger.Fatalf("DB failed to open: %s", err)
 		return
@@ -58,7 +62,7 @@ func addTestUser(db *database.Database, logger *log.Logger) {
 		return
 	}
 	if _, err := db.Users().Insert(types.User{
-		Email: "test@test.com",
+		Email:    "test@test.com",
 		Password: p,
 	}); err != nil {
 		logger.Fatalf("Failed to insert test user")

@@ -5,6 +5,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/m50/shinidex/pkg/config"
 	"github.com/m50/shinidex/pkg/database"
 	"github.com/m50/shinidex/pkg/database/passwords"
 	"github.com/m50/shinidex/pkg/views"
@@ -15,8 +16,10 @@ import (
 func Router(e *echo.Echo) {
 	group := e.Group("/auth")
 
-	group.GET("/register", registerForm)
-	group.POST("/register", register)
+	if !config.Loaded.DisallowRegistration {
+		group.GET("/register", registerForm)
+		group.POST("/register", register, middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
+	}
 
 	group.GET("/login", loginForm)
 	group.POST("/login", login, middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))

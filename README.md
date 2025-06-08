@@ -7,6 +7,7 @@ DB_PATH="file:shinidex.db" #Example for if using a local DB
 TURSO_URL= #Only necessary if using Turso and not a local DB
 TURSO_AUTH_TOKEN= #Only necessary if using Turso and not a local DB
 AUTH_KEY= #Generate a reasonable auth key
+DISALLOW_REGISTRATION= #Set as "true" to disable the registration page
 ```
 
 ## Running with Docker Compose

@@ -4,13 +4,12 @@ import (
 	crand "crypto/rand"
 	"database/sql"
 	"database/sql/driver"
-	"fmt"
 	"math/big"
-	"os"
 	"strconv"
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/m50/shinidex/pkg/config"
 	"github.com/tursodatabase/go-libsql"
 )
 
@@ -22,13 +21,10 @@ type Database struct {
 	conn *sqlx.DB
 }
 
-func NewFromEnv() (*Database, error) {
-	file := os.Getenv("DB_PATH")
-	if file == "" {
-		return nil, fmt.Errorf("DB_PATH envvar needs to be set")
-	}
-	dbUrl := os.Getenv("TURSO_URL")
-	authToken := os.Getenv("TURSO_AUTH_TOKEN")
+func NewFromLoadedConfig() (*Database, error) {
+	file := config.Loaded.DBPath
+	dbUrl := config.Loaded.TursoURL
+	authToken := config.Loaded.TursoAuthToken
 	return New(file, dbUrl, authToken)
 }
 
@@ -74,11 +70,11 @@ func generateId() string {
 		r := k.Int64()
 		randComponent += strconv.FormatInt(r, 36)
 	}
-	
+
 	max := len(randComponent) - (32 - len(timeComponent))
 	start, _ := crand.Int(crand.Reader, big.NewInt(int64(max)))
 	randComponent = randComponent[start.Int64():]
-	
+
 	id := timeComponent + randComponent
 	return id[:32]
 }

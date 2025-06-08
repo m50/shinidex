@@ -2,13 +2,13 @@ package web
 
 import (
 	"net/http"
-	"os"
 
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
+	"github.com/m50/shinidex/pkg/config"
 	"github.com/m50/shinidex/pkg/database"
 	"github.com/m50/shinidex/pkg/views"
 	"github.com/m50/shinidex/pkg/web/handlers/auth"
@@ -60,7 +60,7 @@ func New(db *database.Database, logger *log.Logger) *echo.Echo {
 	e.Use(middleware.Recover())
 	e.Use(middleware.Gzip())
 	e.Use(middleware.Secure())
-	e.Use(session.Middleware(sessions.NewCookieStore([]byte(os.Getenv("AUTH_KEY")))))
+	e.Use(session.Middleware(sessions.NewCookieStore(config.Loaded.AuthKey)))
 	e.Use(middleware.CORS())
 	e.Use(smiddleware.HeaderMiddleware)
 
