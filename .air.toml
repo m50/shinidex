@@ -25,7 +25,7 @@ tmp_dir = "tmp"
     "kill $(ps | grep shinidex | grep main | awk '{print $1}')"
   ]
   pre_cmd = [
-    "go generate ./...",
+    "go tool templ generate",
     "bun run build"
   ]
   rerun = false

@@ -24,7 +24,7 @@ RUN go mod download
 COPY cmd/ ./cmd/
 COPY pkg/ ./pkg/
 
-RUN go generate pkg/...
+RUN go tool templ generate
 RUN CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -o main ./cmd/main.go
 
 FROM gcr.io/distroless/cc-debian12
