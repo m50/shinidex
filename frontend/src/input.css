@@ -19,3 +19,7 @@
     border-color: var(--color-gray-200, currentcolor);
   }
 }
+
+.pot {
+  @apply absolute opacity-0 top-0 left-0 h-0 w-0 -z-10
+}

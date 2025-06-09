@@ -1,0 +1,24 @@
+package auth
+
+templ RegisterForm(f registerFormData) {
+    <form hx-post="/auth/register" class="flex gap-4 flex-col w-96 p-4 rounded-xl" hx-target="#app" hx-swap="innerHTML" hx-push-url="true">
+        @field("E-Mail Address", "email", "email", f.Email, 1)
+        @field("Password", "password", "password", f.Password, 2)
+        @field("Confirm Password", "confirm_password", "password", f.ConfirmPassword, 3)
+        <div class="pot">
+            <label for="name">Name:</label>
+            <input tabindex="5" type="text" id="name" name="name" autocomplete="off" value={ f.Honeypot } />
+        </div>
+        <button tabindex="4" type="submit" class="bg-indigo-500 rounded-xl py-2 px-4 flex-none text-xl mt-4">Login</button>
+    </form>
+}
+
+templ field(label, name, fieldType, value string, tabindex int) {
+    <div class="flex flex-col">
+        <label class="block text-xl" for={ name }>{ label }:</label>
+        <input name={ name } id={ name } required="true" type={ fieldType }
+            class="rounded-xl focus:ring-blue-500 focus:border-blue-500 p-2.5
+                block text-slate-300 bg-slate-700 appearance-none border border-slate-600" 
+            tabindex={ tabindex } value={ value } />
+    </div>
+}
