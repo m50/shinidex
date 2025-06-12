@@ -50,7 +50,7 @@ func main() {
 	go imgdownloader.DownloadImages(db, logger)
 
 	e := web.New(db, logger)
-	if err := e.Start(":1323"); err != nil {
+	if err := e.Start(config.Loaded.WebAddress); err != nil {
 		logger.Fatal(err)
 	}
 }
