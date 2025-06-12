@@ -1,7 +1,9 @@
 package auth
 
 import (
+	"database/sql"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -88,8 +90,12 @@ func login(c echo.Context) error {
 	ctx := c.(database.DBContext)
 	email := c.FormValue("email")
 	user, err := ctx.DB().Users().FindByEmail(email)
-	if err != nil {
-		return views.RenderError(c, err)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return views.RenderView(c, http.StatusInternalServerError, LoginForm(), 
+			views.Error(err))
+	} else if errors.Is(err, sql.ErrNoRows) {
+		return views.RenderView(c, http.StatusForbidden, LoginForm(), 
+			views.Error(fmt.Errorf("no account found for %s", email)))
 	}
 
 	if err := passwords.ComparePasswords(user.Password, c.FormValue("password")); err != nil {
@@ -98,7 +104,8 @@ func login(c echo.Context) error {
 
 	if err := session.New(c, user); err != nil {
 		c.Logger().Error(err)
-		return views.RenderError(c, err)
+		return views.RenderView(c, http.StatusInternalServerError, LoginForm(), 
+			views.Error(err))
 	}
 
 	return c.Redirect(http.StatusMovedPermanently, "/")
