@@ -21,7 +21,7 @@ func DownloadImages(db *database.Database, logger *log.Logger) {
 		return
 	}
 
-	logger.Info("[img-downloader] Preparing download of pokemon images...")
+	logger.Info("Preparing download of pokemon images...")
 	wg := &sync.WaitGroup{}
 	wg.Add(len(pokemon))
 	for idx, pkmn := range pokemon {
@@ -39,29 +39,29 @@ func DownloadImages(db *database.Database, logger *log.Logger) {
 
 	wg.Wait()
 
-	logger.Info("[img-downloader] Done")
+	logger.Info("Done")
 }
 
 func downloadPokemonImages(wg *sync.WaitGroup, pkmn types.Pokemon, logger *log.Logger) {
 	// First get normal image
-	logger.Debugf("[img-downloader] Downloading normal image for %s...", pkmn.ID)
+	logger.Debugf("Downloading normal image for %s...", pkmn.ID)
 	localPath := pkmn.GetLocalImagePath(false)
 	foreignPath := pkmn.GetImageURL(false)
 	if err := fetchImage(foreignPath, localPath); err != nil {
-		logger.Errorf("[img-downloader] Unable to fetch normal local image for pokemon [%s]: %s", pkmn.ID, err)
+		logger.Errorf("Unable to fetch normal local image for pokemon [%s]: %s", pkmn.ID, err)
 		wg.Done()
 	}
-	logger.Infof("[img-downloader] Downloaded normal image for %s", pkmn.ID)
+	logger.Infof("Downloaded normal image for %s", pkmn.ID)
 
 	// Now get shiny
-	logger.Debugf("[img-downloader] Downloading shiny image for %s...", pkmn.ID)
+	logger.Debugf("Downloading shiny image for %s...", pkmn.ID)
 	localPath = pkmn.GetLocalImagePath(true)
 	foreignPath = pkmn.GetImageURL(true)
 	if err := fetchImage(foreignPath, localPath); err != nil {
-		logger.Errorf("[img-downloader] Unable to fetch shiny local image for pokemon [%s]: %s", pkmn.ID, err)
+		logger.Errorf("Unable to fetch shiny local image for pokemon [%s]: %s", pkmn.ID, err)
 		wg.Done()
 	}
-	logger.Infof("[img-downloader] Downloaded shiny image for %s", pkmn.ID)
+	logger.Infof("Downloaded shiny image for %s", pkmn.ID)
 
 	// Done
 	wg.Done()

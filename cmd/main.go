@@ -16,7 +16,7 @@ import (
 
 func logger() *log.Logger {
 	logger := log.New("shinidex")
-	logger.SetHeader("[${time_rfc3339}] ${level}")
+	logger.SetHeader("[${time_rfc3339}] ${level} [${short_file}:${line}]")
 	logger.SetLevel(log.DEBUG)
 	return logger
 }
