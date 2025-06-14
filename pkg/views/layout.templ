@@ -37,7 +37,7 @@ templ Header(authedUser *types.User, rendersPkmn bool) {
 		if rendersPkmn {
 			<div class="
 				flex justify-center items-center w-full absolute top-16 bg-indigo-500 left-0 h-16
-				sm:relative sm:top-auto sm:bg-transparent sm:left-auto sm:h-auto
+				sm:relative sm:top-auto sm:bg-transparent sm:left-auto sm:h-auto md:justify-start sm:pl-4
 			">
 				@jumpTo()
 			</div>
@@ -62,7 +62,7 @@ templ Header(authedUser *types.User, rendersPkmn bool) {
 }
 
 templ jumpTo() {
-	<form class="flex gap-4 relative">
+	<div class="flex gap-4 relative">
 		<label for="jump-to" class="sr-only">Jump To Pokemon:</label>
 		<div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
 			<svg class="w-4 h-4 text-slate-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -74,11 +74,10 @@ templ jumpTo() {
 		<input id="jump-to" name="jump-to"
 			placeholder="Jump to Pokemon"
 			class="rounded-xl focus:ring-blue-500 focus:border-blue-500 p-2.5
-				block text-slate-300 bg-slate-700 border border-slate-600
-				ps-10 placeholder-slate-400
-				"
+				block text-slate-300 bg-indigo-600 border border-indigo-700
+				ps-10 placeholder-slate-400"
 		/>
-	</form>
+	</div>
 }
 
 templ links(authedUser *types.User) {
