@@ -91,10 +91,10 @@ func login(c echo.Context) error {
 	email := c.FormValue("email")
 	user, err := ctx.DB().Users().FindByEmail(email)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		return views.RenderView(c, http.StatusInternalServerError, LoginForm(), 
+		return views.RenderView(c, http.StatusInternalServerError, LoginForm(),
 			views.Error(err))
 	} else if errors.Is(err, sql.ErrNoRows) {
-		return views.RenderView(c, http.StatusForbidden, LoginForm(), 
+		return views.RenderView(c, http.StatusForbidden, LoginForm(),
 			views.Error(fmt.Errorf("no account found for %s", email)))
 	}
 
@@ -104,7 +104,7 @@ func login(c echo.Context) error {
 
 	if err := session.New(c, user); err != nil {
 		c.Logger().Error(err)
-		return views.RenderView(c, http.StatusInternalServerError, LoginForm(), 
+		return views.RenderView(c, http.StatusInternalServerError, LoginForm(),
 			views.Error(err))
 	}
 

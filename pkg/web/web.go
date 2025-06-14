@@ -15,6 +15,7 @@ import (
 	"github.com/m50/shinidex/pkg/web/handlers/dex"
 	"github.com/m50/shinidex/pkg/web/handlers/pokemon"
 	smiddleware "github.com/m50/shinidex/pkg/web/middleware"
+	"github.com/m50/shinidex/pkg/web/static"
 )
 
 type Context struct {
@@ -27,11 +28,12 @@ func (c Context) DB() *database.Database {
 }
 
 func router(e *echo.Echo) {
-	e.Static("/assets", "assets")
+	e.Static("/assets/imgs", "assets/imgs")
 	e.Static("/icons", "icons")
 	e.GET("/", func(c echo.Context) error {
 		return c.Redirect(http.StatusMovedPermanently, e.Reverse("pokemon-list"))
 	})
+	static.Router(e)
 	auth.Router(e)
 	pokemon.Router(e)
 	dex.Router(e)

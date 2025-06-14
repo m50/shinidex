@@ -4,6 +4,7 @@ import "fmt"
 import "github.com/m50/shinidex/pkg/types"
 import "github.com/m50/shinidex/pkg/config"
 import "github.com/m50/shinidex/pkg/utils"
+import "github.com/m50/shinidex/pkg/web/static"
 
 templ BaseLayout(authedUser *types.User, rendersPkmn bool) {
 	<!DOCTYPE html>
@@ -11,8 +12,8 @@ templ BaseLayout(authedUser *types.User, rendersPkmn bool) {
 		<head>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-			<link rel="stylesheet" href="/assets/style.css"/>
-			<script src="/assets/scripts.js"></script>
+			<link rel="stylesheet" href={ static.GetStylePath() } />
+			<script src={ static.GetScriptPath() }></script>
 			<title>Shinidex</title>
 			@IconList()
 		</head>
