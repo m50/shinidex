@@ -47,6 +47,7 @@ templ Pokemon(dex types.Pokedex, pkmn types.Pokemon) {
 		<div
 			class="w-14 h-14 text-slate-800 hover:bg-indigo-300 flex justify-center items-center rounded-xl"
 			title={ pkmn.Name }
+			id={ pkmn.ID }
 			if !pkmn.Caught && ((c.Shiny && !pkmn.ShinyLocked) || !c.Shiny) {
 				hx-patch={ fmt.Sprintf("/dex/%s/pkmn/%s", dex.ID, pkmn.ID) }
 			}

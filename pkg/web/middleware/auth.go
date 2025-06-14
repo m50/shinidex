@@ -57,6 +57,6 @@ func HeaderMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 			return nil
 		}
 		user, _ := session.GetAuthedUser(c)
-		return views.AddView(c, views.Header(user))
+		return views.AddView(c, views.Header(user, true))
 	}
 }

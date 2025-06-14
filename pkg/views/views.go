@@ -11,7 +11,9 @@ import (
 
 func renderWrappedView(ctx echo.Context, t templ.Component) error {
 	user, _ := session.GetAuthedUser(ctx)
-	base := BaseLayout(user)
+	v, ok := ctx.Get("rendersPokemon").(bool)
+	rendersPkmn := ok && v
+	base := BaseLayout(user, rendersPkmn)
 	children := templ.WithChildren(ctx.Request().Context(), t)
 	return base.Render(children, ctx.Response().Writer)
 }

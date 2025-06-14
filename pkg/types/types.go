@@ -188,6 +188,7 @@ type Pokedex struct {
 	Name    string
 	OwnerID string `db:"owner_id"`
 	Config  string
+	config  PokedexConfig
 	Created int64
 	Updated int64
 }
@@ -250,12 +251,18 @@ type PokedexConfig struct {
 	GenderForms   FormLocation
 	RegionalForms FormLocation
 	GMaxForms     FormLocation
+	set bool
 }
 
 func (p Pokedex) GetConfig() (PokedexConfig, error) {
-	var conf PokedexConfig
-	err := json.Unmarshal([]byte(p.Config), &conf)
-	return conf, err
+	var err error
+	if !p.config.set {
+		err = json.Unmarshal([]byte(p.Config), &p.config)
+		if err == nil {
+			p.config.set = true
+		}
+	}
+	return p.config, err
 }
 func (p *Pokedex) UpdateConfig(config PokedexConfig) error {
 	c, err := json.Marshal(config)

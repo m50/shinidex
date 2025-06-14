@@ -18,6 +18,7 @@ func Router(e *echo.Echo) {
 }
 
 func list(c echo.Context) error {
+	c.Set("rendersPokemon", true)
 	ctx := c.(database.DBContext)
 	pkmn, err := ctx.DB().Pokemon().GetAllAsSeparateForms()
 	if err != nil {
@@ -28,6 +29,7 @@ func list(c echo.Context) error {
 }
 
 func box(c echo.Context) error {
+	c.Set("rendersPokemon", true)
 	ctx := c.(database.DBContext)
 	pageNum, err := strconv.Atoi(c.Param("box"))
 	if err != nil {

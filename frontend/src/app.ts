@@ -1,10 +1,12 @@
 import registerHamburgerMenu from './components/hamburger-menu';
-import feed from './components/notification-feed';
+import registerNotificationFeed from './components/notification-feed';
+import registerJumpTo from './components/jump-to';
 import { isHTMXEvent } from './htmx-types'
 
 export default () => {
-    feed()
+    registerNotificationFeed()
     registerHamburgerMenu()
+    registerJumpTo()
     document.body.addEventListener('htmx:beforeOnLoad', (e: Event) => {
         if (!isHTMXEvent<any>(e)) {
             return
@@ -19,5 +21,6 @@ export default () => {
             return
         }
         registerHamburgerMenu()
+        registerJumpTo()
     })
 };

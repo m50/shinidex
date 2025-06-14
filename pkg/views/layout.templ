@@ -5,7 +5,7 @@ import "github.com/m50/shinidex/pkg/types"
 import "github.com/m50/shinidex/pkg/config"
 import "github.com/m50/shinidex/pkg/utils"
 
-templ BaseLayout(authedUser *types.User) {
+templ BaseLayout(authedUser *types.User, rendersPkmn bool) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -17,7 +17,7 @@ templ BaseLayout(authedUser *types.User) {
 			@IconList()
 		</head>
 		<body class="min-h-screen flex flex-col">
-			@Header(authedUser)
+			@Header(authedUser, rendersPkmn)
 			@body() {
 				{ children... }
 			}
@@ -26,7 +26,7 @@ templ BaseLayout(authedUser *types.User) {
 	</html>
 }
 
-templ Header(authedUser *types.User) {
+templ Header(authedUser *types.User, rendersPkmn bool) {
 	<header hx-swap-oob="true" id="header" class="z-50 fixed px-4 w-full flex gap-4 bg-indigo-500 text-slate-200 h-16 text-3xl justify-between items-center">
 		<span class="flex-row flex justify-center items-center gap-2">
 			<span class="h-12 w-12">
@@ -34,6 +34,14 @@ templ Header(authedUser *types.User) {
 			</span>
 			Shinidex
 		</span>
+		if rendersPkmn {
+			<div class="
+				flex justify-center items-center w-full absolute top-16 bg-indigo-500 left-0 h-16
+				sm:relative sm:top-auto sm:bg-transparent sm:left-auto sm:h-auto
+			">
+				@jumpTo()
+			</div>
+		}
 		<button type="button" id="navbar-button"
 			class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm bg-white
 				text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-hidden 
@@ -51,6 +59,26 @@ templ Header(authedUser *types.User) {
 			@links(authedUser)	
 		</nav>
 	</header>
+}
+
+templ jumpTo() {
+	<form class="flex gap-4 relative">
+		<label for="jump-to" class="sr-only">Jump To Pokemon:</label>
+		<div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+			<svg class="w-4 h-4 text-slate-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+				fill="none" viewBox="0 0 20 20">
+				<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+					d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+			</svg>
+		</div>
+		<input id="jump-to" name="jump-to"
+			placeholder="Jump to Pokemon"
+			class="rounded-xl focus:ring-blue-500 focus:border-blue-500 p-2.5
+				block text-slate-300 bg-slate-700 border border-slate-600
+				ps-10 placeholder-slate-400
+				"
+		/>
+	</form>
 }
 
 templ links(authedUser *types.User) {
@@ -74,7 +102,7 @@ templ empty() {
 }
 
 templ body() {
-	<main id="app" class="mt-16 pt-8 flex-1 bg-slate-800 text-slate-200 w-full h-full flex justify-center">
+	<main id="app" class="mt-32 sm:mt-16 pt-8 flex-1 bg-slate-800 text-slate-200 w-full h-full flex justify-center">
 		{ children... }
 	</main>
 }

@@ -20,6 +20,7 @@ func showRouter(g *echo.Group) {
 }
 
 func show(c echo.Context) error {
+	c.Set("rendersPokemon", true)
 	db := c.(database.DBContext).DB()
 	dex, err := db.Pokedexes().FindByID(c.Param("dex"))
 	if err != nil {

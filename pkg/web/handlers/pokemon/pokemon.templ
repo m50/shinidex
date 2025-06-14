@@ -75,6 +75,7 @@ templ Pokemon(pkmn types.Pokemon, shiny bool) {
 	<div
 		class="w-14 h-14 text-slate-800 hover:bg-indigo-300 flex justify-center items-center rounded-xl"
 		title={ pkmn.Name }
+		id={ pkmn.ID }
 	>
 		<img
 			src={ pkmn.GetImageURL(shiny) }
