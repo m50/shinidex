@@ -26,7 +26,7 @@ func (db *Database) Migrate(path string) error {
 	_, err = db.conn.Exec("SELECT * FROM migrations;")
 	if err != nil {
 		if _, err = db.conn.Exec(migrationSchema); err != nil {
-			return err
+			logger.Errorf("possible failure in migrating: %v", err)
 		}
 	}
 
