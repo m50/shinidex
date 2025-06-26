@@ -8,7 +8,6 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/labstack/gommon/log"
 	"github.com/m50/shinidex/pkg/types"
 	"github.com/stretchr/testify/assert"
 )
@@ -19,7 +18,6 @@ func TestDownloadPokemonImages(t *testing.T) {
 
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
-	logger := log.New("test")
 
 	pkmn := types.Pokemon{
 		ID: "blastoise",
@@ -40,7 +38,7 @@ func TestDownloadPokemonImages(t *testing.T) {
 		return
 	}
 
-	go downloadPokemonImages(wg, pkmn, logger)
+	go downloadPokemonImages(wg, pkmn)
 	wg.Wait()
 
 	// Make sure image downloaded and saved

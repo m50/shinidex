@@ -9,12 +9,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/labstack/gommon/log"
 	"github.com/m50/shinidex/pkg/database"
+	"github.com/m50/shinidex/pkg/logger"
 	"github.com/m50/shinidex/pkg/types"
 )
 
-func DownloadImages(db *database.Database, logger *log.Logger) {
+func DownloadImages(db *database.Database) {
 	pokemon, err := db.Pokemon().GetAllAsSeparateForms()
 	if err != nil {
 		logger.Error("Failed to fetch pokemon images: ", err)
@@ -30,7 +30,7 @@ func DownloadImages(db *database.Database, logger *log.Logger) {
 			wg.Done()
 			continue
 		}
-		go downloadPokemonImages(wg, pkmn, logger)
+		go downloadPokemonImages(wg, pkmn)
 		// only do 10 per 5 seconds
 		if idx%10 == 0 {
 			<-time.After(5 * time.Second)
@@ -42,7 +42,7 @@ func DownloadImages(db *database.Database, logger *log.Logger) {
 	logger.Info("Done")
 }
 
-func downloadPokemonImages(wg *sync.WaitGroup, pkmn types.Pokemon, logger *log.Logger) {
+func downloadPokemonImages(wg *sync.WaitGroup, pkmn types.Pokemon) {
 	// First get normal image
 	logger.Debugf("Downloading normal image for %s...", pkmn.ID)
 	localPath := pkmn.GetLocalImagePath(false)

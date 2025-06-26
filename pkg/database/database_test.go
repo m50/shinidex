@@ -6,10 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/labstack/gommon/log"
 	"github.com/m50/shinidex/pkg/types"
 	"github.com/stretchr/testify/assert"
-	l "github.com/m50/shinidex/pkg/logger"
 )
 
 func SetupDB(t *testing.T) *Database {
@@ -21,12 +19,6 @@ func SetupDB(t *testing.T) *Database {
 	assert.Nil(t, err, "There is an error migrating ", err)
 
 	return db
-}
-
-func SetupDBWithLogger(t *testing.T, logger *log.Logger) *Database {
-	t.Helper()
-	l.SetDefaultLogger(logger)
-	return SetupDB(t)
 }
 
 func TestGenerateId(t *testing.T) {
