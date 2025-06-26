@@ -3,12 +3,12 @@ package logger
 import (
 	"fmt"
 
-	"github.com/labstack/gommon/log"
+	"github.com/gookit/slog"
 )
 
-var defaultLogger *log.Logger
+var defaultLogger *slog.Record
 
-func SetDefaultLogger(l *log.Logger) {
+func SetDefaultLogger(l *slog.Record) {
 	defaultLogger = l
 }
 
