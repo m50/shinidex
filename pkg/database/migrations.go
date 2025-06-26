@@ -1,3 +1,4 @@
+// TODO: switch to [migrate](https://github.com/golang-migrate/migrate)
 package database
 
 import (

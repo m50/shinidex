@@ -43,6 +43,7 @@ func router(e *echo.Echo) {
 }
 
 func New(db *database.Database) *echo.Echo {
+	// TODO: switch to [go-chi](https://github.com/go-chi/chi)
 	e := echo.New()
 	e.HideBanner = true
 
