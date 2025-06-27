@@ -15,6 +15,7 @@ import (
 	"github.com/m50/shinidex/pkg/web/handlers/pokemon"
 	smiddleware "github.com/m50/shinidex/pkg/web/middleware"
 	"github.com/m50/shinidex/pkg/web/static"
+	"github.com/spf13/viper"
 )
 
 type Context struct {
@@ -43,7 +44,6 @@ func router(e *echo.Echo) {
 }
 
 func New(db *database.Database) *echo.Echo {
-	// TODO: switch to [go-chi](https://github.com/go-chi/chi)
 	e := echo.New()
 	e.HideBanner = true
 
@@ -54,9 +54,11 @@ func New(db *database.Database) *echo.Echo {
 			return next(cc)
 		}
 	})
-	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-		Format: "[${time_rfc3339}] \x1b[34mRQST\x1b[0m ${method} http://${host}${uri} : ${status} ${error}\n",
-	}))
+	if viper.GetBool("logging.access-logs") {
+		e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+			Format: "[${time_rfc3339}] \x1b[34mRQST\x1b[0m ${method} http://${host}${uri} : ${status} ${error}\n",
+		}))
+	}
 	e.Use(smiddleware.ErrorHandler)
 	e.Use(middleware.Recover())
 	e.Use(middleware.Gzip())
