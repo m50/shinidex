@@ -2,7 +2,6 @@ package maincmd
 
 import (
 	"github.com/gookit/slog"
-	"github.com/m50/shinidex/pkg/config"
 	"github.com/m50/shinidex/pkg/database"
 	imgdownloader "github.com/m50/shinidex/pkg/img-downloader"
 	l "github.com/m50/shinidex/pkg/logger"
@@ -13,7 +12,7 @@ import (
 
 func logger() *slog.Record {
 	logger := &slog.Record{}
-	slog.SetLevelByName(viper.GetString("log-level"))
+	slog.SetLevelByName(viper.GetString("logging.level"))
 	return logger
 }
 
@@ -35,7 +34,7 @@ func Run(cmd *cobra.Command, args []string) {
 	go imgdownloader.DownloadImages(db)
 
 	e := web.New(db)
-	if err := e.Start(config.Loaded.WebAddress); err != nil {
+	if err := e.Start(viper.GetString("listen-address")); err != nil {
 		logger.Fatal(err)
 	}
 }
