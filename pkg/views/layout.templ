@@ -2,9 +2,9 @@ package views
 
 import "fmt"
 import "github.com/m50/shinidex/pkg/types"
-import "github.com/m50/shinidex/pkg/config"
 import "github.com/m50/shinidex/pkg/utils"
 import "github.com/m50/shinidex/pkg/web/static"
+import "github.com/spf13/viper"
 
 templ BaseLayout(authedUser *types.User, rendersPkmn bool) {
 	<!DOCTYPE html>
@@ -91,7 +91,7 @@ templ links(authedUser *types.User) {
 			class="hover:text-indigo-400 flex-none cursor-pointer">Logout</a>
 	} else {
 		<a href="/auth/login" class="hover:text-indigo-400 flex-none cursor-pointer">Login</a>
-		if !config.Loaded.DisallowRegistration {
+		if !viper.GetBool("auth.disable-registration") {
 			<a href="/auth/register" class="hover:text-indigo-400 flex-none cursor-pointer">Register</a>
 		}
 	}

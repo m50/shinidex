@@ -190,8 +190,8 @@ type Pokedex struct {
 	OwnerID string `db:"owner_id"`
 	Config  string
 	config  PokedexConfig
-	Created int64
-	Updated int64
+	Created time.Time
+	Updated time.Time
 }
 
 func NewPokedex(ownerID, name string, config PokedexConfig) (Pokedex, error) {
@@ -225,11 +225,12 @@ func (f FormLocation) Value() string {
 	return fmt.Sprintf("%d", f)
 }
 func (f FormLocation) String() string {
-	if f == Off {
+	switch f {
+	case Off:
 		return "Off"
-	} else if f == After {
+	case After:
 		return "With base form"
-	} else {
+	default:
 		return "After Pokedex"
 	}
 }
@@ -278,6 +279,6 @@ type PokedexEntry struct {
 	PokedexID string `db:"pokedex_id"`
 	PokemonID string `db:"pokemon_id"`
 	FormID    string `db:"form_id"`
-	Created   int64
-	Updated   int64
+	Created   time.Time
+	Updated   time.Time
 }

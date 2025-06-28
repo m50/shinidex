@@ -34,8 +34,8 @@ func (db PokedexesDB) Insert(p types.Pokedex) (string, error) {
 	VALUES (:id, :name, :owner_id, :config, :created, :updated);
 	`
 	p.ID = generateId()
-	p.Created = time.Now().UTC().Unix()
-	p.Updated = time.Now().UTC().Unix()
+	p.Created = time.Now()
+	p.Updated = time.Now()
 	_, err := db.conn.NamedExec(q, p)
 	return p.ID, err
 }
@@ -47,7 +47,7 @@ func (db PokedexesDB) Update(p types.Pokedex) error {
 		updated = :updated
 	WHERE id = :id;
 	`
-	p.Updated = time.Now().UTC().Unix()
+	p.Updated = time.Now()
 	_, err := db.conn.NamedExec(q, p)
 	return err
 }
@@ -74,8 +74,8 @@ func (db PokedexEntriesDB) Catch(pokedexID, pokemonID, formID string) error {
 		PokedexID: pokedexID,
 		PokemonID: pokemonID,
 		FormID:    formID,
-		Created:   time.Now().UTC().Unix(),
-		Updated:   time.Now().UTC().Unix(),
+		Created:   time.Now(),
+		Updated:   time.Now(),
 	}
 
 	r, err := db.conn.NamedExec(q, entry)
