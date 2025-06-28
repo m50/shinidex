@@ -32,8 +32,8 @@ func (db UserDB) Insert(user types.User) (string, error) {
 	INSERT INTO users (id, email, password, created, updated)
 	VALUES (:id, :email, :password, :created, :updated);
 	`
-	user.Created = time.Now().UTC().Unix()
-	user.Updated = time.Now().UTC().Unix()
+	user.Created = time.Now()
+	user.Updated = time.Now()
 	user.ID = generateId()
 	_, err := db.conn.NamedExec(query, user)
 	return user.ID, err
@@ -49,7 +49,7 @@ func (db UserDB) Update(user types.User) error {
 	WHERE id = :id;
 	`
 
-	user.Updated = time.Now().UTC().Unix()
+	user.Updated = time.Now()
 	_, err := db.conn.NamedExec(query, user)
 	return err
 }
