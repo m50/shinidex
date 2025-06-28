@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -15,19 +16,19 @@ func (db Database) Users() UserDB {
 	return UserDB(db)
 }
 
-func (db UserDB) FindByID(id string) (types.User, error) {
+func (db UserDB) FindByID(ctx context.Context, id string) (types.User, error) {
 	user := types.User{}
-	err := db.conn.Get(&user, "SELECT * FROM users WHERE id = $1", id)
+	err := db.conn.GetContext(ctx, &user, "SELECT * FROM users WHERE id = $1", id)
 	return user, err
 }
 
-func (db UserDB) FindByEmail(email string) (types.User, error) {
+func (db UserDB) FindByEmail(ctx context.Context, email string) (types.User, error) {
 	user := types.User{}
-	err := db.conn.Get(&user, "SELECT * FROM users WHERE email = $1", email)
+	err := db.conn.GetContext(ctx, &user, "SELECT * FROM users WHERE email = $1", email)
 	return user, err
 }
 
-func (db UserDB) Insert(user types.User) (string, error) {
+func (db UserDB) Insert(ctx context.Context, user types.User) (string, error) {
 	query := `
 	INSERT INTO users (id, email, password, created, updated)
 	VALUES (:id, :email, :password, :created, :updated);
@@ -35,11 +36,11 @@ func (db UserDB) Insert(user types.User) (string, error) {
 	user.Created = time.Now()
 	user.Updated = time.Now()
 	user.ID = generateId()
-	_, err := db.conn.NamedExec(query, user)
+	_, err := db.conn.NamedExecContext(ctx, query, user)
 	return user.ID, err
 }
 
-func (db UserDB) Update(user types.User) error {
+func (db UserDB) Update(ctx context.Context, user types.User) error {
 	query := `
 	UPDATE users
 	SET email = :email,
@@ -50,11 +51,11 @@ func (db UserDB) Update(user types.User) error {
 	`
 
 	user.Updated = time.Now()
-	_, err := db.conn.NamedExec(query, user)
+	_, err := db.conn.NamedExecContext(ctx, query, user)
 	return err
 }
 
-func (db UserDB) Delete(id string) error {
-	_, err := db.conn.Exec("DELETE FROM users WHERE id = $1", id)
+func (db UserDB) Delete(ctx context.Context, id string) error {
+	_, err := db.conn.ExecContext(ctx, "DELETE FROM users WHERE id = $1", id)
 	return err
 }

@@ -1,6 +1,8 @@
 package maincmd
 
 import (
+	"context"
+
 	"github.com/gookit/slog"
 	"github.com/m50/shinidex/pkg/database"
 	imgdownloader "github.com/m50/shinidex/pkg/img-downloader"
@@ -32,7 +34,7 @@ func Run(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	go imgdownloader.DownloadImages(db)
+	go imgdownloader.DownloadImages(context.Background(), db)
 
 	e := web.New(db)
 	if err := e.Start(viper.GetString("listen-address")); err != nil {

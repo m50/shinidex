@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/m50/shinidex/pkg/context"
 	"github.com/m50/shinidex/pkg/database"
 	"github.com/m50/shinidex/pkg/views"
 	"github.com/m50/shinidex/pkg/web/errors"
@@ -30,7 +31,7 @@ func AuthzMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 			return next(c)
 		}
 		db := c.(database.DBContext).DB()
-		dex, err := db.Pokedexes().FindByID(dexID)
+		dex, err := db.Pokedexes().FindByID(context.FromEcho(c), dexID)
 		if err != nil {
 			return err
 		}

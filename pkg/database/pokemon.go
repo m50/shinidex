@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"fmt"
 	"slices"
 	"strings"
@@ -26,50 +27,50 @@ func (db PokemonDB) Forms() PokemonFormsDB {
 	return PokemonFormsDB(db)
 }
 
-func (db PokemonDB) GetAll() (types.PokemonList, error) {
+func (db PokemonDB) GetAll(ctx context.Context) (types.PokemonList, error) {
 	pokemon := types.PokemonList{}
-	err := db.conn.Select(&pokemon, "SELECT * FROM pokemon ORDER BY national_dex_number")
+	err := db.conn.SelectContext(ctx, &pokemon, "SELECT * FROM pokemon ORDER BY national_dex_number")
 	return pokemon, err
 }
 
-func (db PokemonDB) Get(rows, page int) (types.PokemonList, error) {
+func (db PokemonDB) Get(ctx context.Context, rows, page int) (types.PokemonList, error) {
 	pokemon := types.PokemonList{}
 	offset := math.Max(page-1, 0) * rows
-	err := db.conn.Select(&pokemon, "SELECT * FROM pokemon ORDER BY national_dex_number LIMIT $1 OFFSET $2", rows, offset)
+	err := db.conn.SelectContext(ctx, &pokemon, "SELECT * FROM pokemon ORDER BY national_dex_number LIMIT $1 OFFSET $2", rows, offset)
 	return pokemon, err
 }
 
-func (db PokemonDB) FindByID(id string) (types.Pokemon, error) {
+func (db PokemonDB) FindByID(ctx context.Context, id string) (types.Pokemon, error) {
 	pokemon := types.Pokemon{}
-	err := db.conn.Get(&pokemon, "SELECT * FROM pokemon WHERE id = $1", id)
+	err := db.conn.GetContext(ctx, &pokemon, "SELECT * FROM pokemon WHERE id = $1", id)
 	return pokemon, err
 }
 
-func (db PokemonFormsDB) GetAll() ([]types.PokemonForm, error) {
+func (db PokemonFormsDB) GetAll(ctx context.Context) ([]types.PokemonForm, error) {
 	forms := []types.PokemonForm{}
-	err := db.conn.Select(&forms, "SELECT * FROM pokemon_forms")
+	err := db.conn.SelectContext(ctx, &forms, "SELECT * FROM pokemon_forms")
 	return forms, err
 }
 
-func (db PokemonFormsDB) FindByPokemonID(pokemonID string) ([]types.PokemonForm, error) {
+func (db PokemonFormsDB) FindByPokemonID(ctx context.Context, pokemonID string) ([]types.PokemonForm, error) {
 	forms := []types.PokemonForm{}
-	err := db.conn.Select(&forms, "SELECT * FROM pokemon_forms WHERE pokemon_id = $1", pokemonID)
+	err := db.conn.SelectContext(ctx, &forms, "SELECT * FROM pokemon_forms WHERE pokemon_id = $1", pokemonID)
 	return forms, err
 }
 
-func (db PokemonFormsDB) FindByID(pokemonID string, formID string) (types.PokemonForm, error) {
+func (db PokemonFormsDB) FindByID(ctx context.Context, pokemonID string, formID string) (types.PokemonForm, error) {
 	form := types.PokemonForm{}
-	err := db.conn.Get(&form, "SELECT * FROM pokemon_forms WHERE id = $1 AND pokemon_id = $2", formID, pokemonID)
+	err := db.conn.GetContext(ctx, &form, "SELECT * FROM pokemon_forms WHERE id = $1 AND pokemon_id = $2", formID, pokemonID)
 	return form, err
 }
 
-func (db PokemonDB) FindByFullFormID(fullFormID string) (types.Pokemon, error) {
+func (db PokemonDB) FindByFullFormID(ctx context.Context, fullFormID string) (types.Pokemon, error) {
 	parts := strings.Split(fullFormID, "+")
-	pkmn, err := db.FindByID(parts[0])
+	pkmn, err := db.FindByID(ctx, parts[0])
 	if err != nil || len(parts) == 1 {
 		return pkmn, err
 	}
-	f, err := db.Forms().FindByID(parts[0], parts[1])
+	f, err := db.Forms().FindByID(ctx, parts[0], parts[1])
 	if err != nil {
 		return types.Pokemon{}, err
 	}
@@ -82,12 +83,12 @@ func (db PokemonDB) FindByFullFormID(fullFormID string) (types.Pokemon, error) {
 	}, nil
 }
 
-func (db PokemonDB) GetAllAsSeparateForms() (types.PokemonList, error) {
-	pokemon, err := db.GetAll()
+func (db PokemonDB) GetAllAsSeparateForms(ctx context.Context) (types.PokemonList, error) {
+	pokemon, err := db.GetAll(ctx)
 	if err != nil {
 		return nil, err
 	}
-	forms, err := db.Forms().GetAll()
+	forms, err := db.Forms().GetAll(ctx)
 	if err != nil {
 		return nil, err
 	}

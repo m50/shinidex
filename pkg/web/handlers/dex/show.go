@@ -7,6 +7,7 @@ import (
 
 	"github.com/gookit/slog"
 	"github.com/labstack/echo/v4"
+	"github.com/m50/shinidex/pkg/context"
 	"github.com/m50/shinidex/pkg/database"
 	"github.com/m50/shinidex/pkg/types"
 	"github.com/m50/shinidex/pkg/views"
@@ -20,9 +21,10 @@ func showRouter(g *echo.Group) {
 }
 
 func show(c echo.Context) error {
+	ctx := context.FromEcho(c)
 	c.Set("rendersPokemon", true)
 	db := c.(database.DBContext).DB()
-	dex, err := db.Pokedexes().FindByID(c.Param("dex"))
+	dex, err := db.Pokedexes().FindByID(ctx, c.Param("dex"))
 	if err != nil {
 		return views.RenderError(c, err)
 	}
@@ -30,11 +32,11 @@ func show(c echo.Context) error {
 	if err != nil {
 		return views.RenderError(c, err)
 	}
-	pokemon, err := db.Pokemon().GetAllAsSeparateForms()
+	pokemon, err := db.Pokemon().GetAllAsSeparateForms(ctx)
 	if err != nil {
 		return views.RenderError(c, err)
 	}
-	entries, err := db.Pokedexes().Entries().List(dex.ID)
+	entries, err := db.Pokedexes().Entries().List(ctx, dex.ID)
 	if err != nil {
 		return views.RenderError(c, err)
 	}
@@ -88,8 +90,9 @@ func show(c echo.Context) error {
 }
 
 func boxCatch(c echo.Context) error {
+	ctx := context.FromEcho(c)
 	db := c.(database.DBContext).DB()
-	dex, err := db.Pokedexes().FindByID(c.Param("dex"))
+	dex, err := db.Pokedexes().FindByID(ctx, c.Param("dex"))
 	if err != nil {
 		return err
 	}
@@ -103,13 +106,13 @@ func boxCatch(c echo.Context) error {
 
 	pkmnList := make(types.PokemonList, len(f.PKMN))
 	for idx := range f.PKMN {
-		pkmn, err := db.Pokemon().FindByFullFormID(f.PKMN[idx])
+		pkmn, err := db.Pokemon().FindByFullFormID(ctx, f.PKMN[idx])
 		if err != nil {
 			return err
 		}
 
 		pkmnID, formID := pkmn.IDParts()
-		if err = db.Pokedexes().Entries().Catch(dex.ID, pkmnID, formID); err != nil {
+		if err = db.Pokedexes().Entries().Catch(ctx, dex.ID, pkmnID, formID); err != nil {
 			slog.Error(f.PKMN[idx], ": ", err, "; likely already marked as caught")
 		} else {
 			slog.Infof("%s: caught for dex %s", pkmn.ID, dex.ID)
@@ -127,18 +130,19 @@ func boxCatch(c echo.Context) error {
 }
 
 func catch(c echo.Context) error {
+	ctx := context.FromEcho(c)
 	db := c.(database.DBContext).DB()
-	dex, err := db.Pokedexes().FindByID(c.Param("dex"))
+	dex, err := db.Pokedexes().FindByID(ctx, c.Param("dex"))
 	if err != nil {
 		return err
 	}
-	pkmn, err := db.Pokemon().FindByFullFormID(c.Param("pkmn"))
+	pkmn, err := db.Pokemon().FindByFullFormID(ctx, c.Param("pkmn"))
 	if err != nil {
 		return err
 	}
 
 	pkmnID, formID := pkmn.IDParts()
-	if err = db.Pokedexes().Entries().Catch(dex.ID, pkmnID, formID); err != nil {
+	if err = db.Pokedexes().Entries().Catch(ctx, dex.ID, pkmnID, formID); err != nil {
 		return err
 	}
 	if !pkmn.ShinyLocked {
@@ -153,18 +157,19 @@ func catch(c echo.Context) error {
 }
 
 func release(c echo.Context) error {
+	ctx := context.FromEcho(c)
 	db := c.(database.DBContext).DB()
-	dex, err := db.Pokedexes().FindByID(c.Param("dex"))
+	dex, err := db.Pokedexes().FindByID(ctx, c.Param("dex"))
 	if err != nil {
 		return err
 	}
-	pkmn, err := db.Pokemon().FindByFullFormID(c.Param("pkmn"))
+	pkmn, err := db.Pokemon().FindByFullFormID(ctx, c.Param("pkmn"))
 	if err != nil {
 		return err
 	}
 
 	pkmnID, formID := pkmn.IDParts()
-	if err = db.Pokedexes().Entries().Release(dex.ID, pkmnID, formID); err != nil {
+	if err = db.Pokedexes().Entries().Release(ctx, dex.ID, pkmnID, formID); err != nil {
 		return err
 	}
 	pkmn.Caught = false

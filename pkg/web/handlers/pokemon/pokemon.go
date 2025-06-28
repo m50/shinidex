@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/labstack/echo/v4"
+	"github.com/m50/shinidex/pkg/context"
 	"github.com/m50/shinidex/pkg/database"
 	"github.com/m50/shinidex/pkg/views"
 	"github.com/m50/shinidex/pkg/web/form"
@@ -18,9 +19,10 @@ func Router(e *echo.Echo) {
 }
 
 func list(c echo.Context) error {
+	ctx := context.FromEcho(c)
 	c.Set("rendersPokemon", true)
-	ctx := c.(database.DBContext)
-	pkmn, err := ctx.DB().Pokemon().GetAllAsSeparateForms()
+	db := c.(database.DBContext).DB()
+	pkmn, err := db.Pokemon().GetAllAsSeparateForms(ctx)
 	if err != nil {
 		return views.RenderError(c, err)
 	}
@@ -29,14 +31,14 @@ func list(c echo.Context) error {
 }
 
 func box(c echo.Context) error {
+	ctx := context.FromEcho(c)
 	c.Set("rendersPokemon", true)
-	ctx := c.(database.DBContext)
+	db := c.(database.DBContext).DB()
 	pageNum, err := strconv.Atoi(c.Param("box"))
 	if err != nil {
 		return views.RenderError(c, err)
 	}
-	// pkmn, err := ctx.DB().Pokemon().Get(30, pageNum)
-	pkmn, err := ctx.DB().Pokemon().GetAllAsSeparateForms()
+	pkmn, err := db.Pokemon().GetAllAsSeparateForms(ctx)
 	pkmn = pkmn.Box(pageNum - 1)
 	if err != nil {
 		return views.RenderError(c, err)
