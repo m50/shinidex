@@ -1,6 +1,7 @@
 package imgdownloader
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"os"
@@ -14,8 +15,8 @@ import (
 	"github.com/m50/shinidex/pkg/types"
 )
 
-func DownloadImages(db *database.Database) {
-	pokemon, err := db.Pokemon().GetAllAsSeparateForms()
+func DownloadImages(ctx context.Context, db *database.Database) {
+	pokemon, err := db.Pokemon().GetAllAsSeparateForms(ctx)
 	if err != nil {
 		slog.Error("Failed to fetch pokemon images: ", err)
 		return
@@ -33,7 +34,11 @@ func DownloadImages(db *database.Database) {
 		go downloadPokemonImages(wg, pkmn)
 		// only do 10 per 5 seconds
 		if idx%10 == 0 {
-			<-time.After(5 * time.Second)
+			select {
+				case <-ctx.Done():
+					slog.WithContext(ctx).Warn("context cancel...")
+				case <-time.After(5 * time.Second):
+			}
 		}
 	}
 

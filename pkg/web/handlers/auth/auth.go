@@ -8,6 +8,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/m50/shinidex/pkg/context"
 	"github.com/m50/shinidex/pkg/database"
 	"github.com/m50/shinidex/pkg/database/passwords"
 	"github.com/m50/shinidex/pkg/types"
@@ -43,6 +44,7 @@ func registerForm(c echo.Context) error {
 }
 
 func register(c echo.Context) error {
+	ctx := context.FromEcho(c)
 	var f registerFormData
 	if err := c.Bind(&f); err != nil {
 		return err
@@ -65,11 +67,11 @@ func register(c echo.Context) error {
 		Email:    f.Email,
 		Password: p,
 	}
-	userID, err := db.Users().Insert(u)
+	userID, err := db.Users().Insert(ctx, u)
 	if err != nil {
 		return err
 	}
-	user, err := db.Users().FindByID(userID)
+	user, err := db.Users().FindByID(ctx, userID)
 	if err != nil {
 		return err
 	}
@@ -87,9 +89,10 @@ func loginForm(c echo.Context) error {
 }
 
 func login(c echo.Context) error {
-	ctx := c.(database.DBContext)
+	ctx := context.FromEcho(c)
+	db := c.(database.DBContext).DB()
 	email := c.FormValue("email")
-	user, err := ctx.DB().Users().FindByEmail(email)
+	user, err := db.Users().FindByEmail(ctx, email)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return views.RenderView(c, http.StatusInternalServerError, LoginForm(),
 			views.Error(err))

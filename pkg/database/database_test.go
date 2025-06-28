@@ -49,23 +49,23 @@ func TestUser(t *testing.T) {
 	t.Parallel()
 	db := SetupDB(t)
 	defer db.Close()
-	_, err := db.Users().Insert(types.User{
+	_, err := db.Users().Insert(t.Context(), types.User{
 		Email:    "test@test.com",
 		Password: "my-password",
 	})
 	assert.Nil(t, err, "Unable to insert user")
-	user, err := db.Users().FindByEmail("test@test.com")
+	user, err := db.Users().FindByEmail(t.Context(), "test@test.com")
 	assert.Nil(t, err, "Unable to get user")
 	assert.Equal(t, "my-password", user.Password)
 	user.Password = "test"
-	err = db.Users().Update(user)
+	err = db.Users().Update(t.Context(), user)
 	assert.Nil(t, err, "Unable to update user")
-	user, err = db.Users().FindByID(user.ID)
+	user, err = db.Users().FindByID(t.Context(), user.ID)
 	assert.Nil(t, err, "Unable to get user")
 	assert.Equal(t, "test", user.Password)
-	err = db.Users().Delete(user.ID)
+	err = db.Users().Delete(t.Context(), user.ID)
 	assert.Nil(t, err, "Unable to delete user")
-	_, err = db.Users().FindByID(user.ID)
+	_, err = db.Users().FindByID(t.Context(), user.ID)
 	assert.Error(t, err)
 }
 
@@ -74,25 +74,25 @@ func TestPokemon(t *testing.T) {
 	db := SetupDB(t)
 	defer db.Close()
 
-	pkmn, err := db.Pokemon().GetAll()
+	pkmn, err := db.Pokemon().GetAll(t.Context())
 	assert.Nil(t, err, "Unable to fetch all Pokemon")
 	assert.Greater(t, len(pkmn), 1020)
 
-	blastoise, err := db.Pokemon().FindByID("blastoise")
+	blastoise, err := db.Pokemon().FindByID(t.Context(), "blastoise")
 	assert.Nil(t, err, "Unable to lookup Blastoise")
 	assert.Equal(t, 9, blastoise.NationalDexNumber)
 	assert.Equal(t, types.Kanto, blastoise.Generation())
 
-	meowscarada, err := db.Pokemon().FindByID("meowscarada")
+	meowscarada, err := db.Pokemon().FindByID(t.Context(), "meowscarada")
 	assert.Nil(t, err, "Unable to lookup Meowscarada")
 	assert.Equal(t, 908, meowscarada.NationalDexNumber)
 	assert.Equal(t, types.Paldea, meowscarada.Generation())
 
-	venaforms, err := db.Pokemon().Forms().FindByPokemonID("venusaur")
+	venaforms, err := db.Pokemon().Forms().FindByPokemonID(t.Context(), "venusaur")
 	assert.Nil(t, err, "Unable to lookup Venasaur forms")
 	assert.Len(t, venaforms, 2)
 
-	first30, err := db.Pokemon().Get(30, 1)
+	first30, err := db.Pokemon().Get(t.Context(), 30, 1)
 	assert.Nil(t, err, "Failed to get first 30 pokemon")
 	assert.Equal(t, "bulbasaur", first30[0].ID)
 }

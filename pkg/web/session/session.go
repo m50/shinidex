@@ -7,13 +7,13 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
+	cntxt "github.com/m50/shinidex/pkg/context"
 	"github.com/m50/shinidex/pkg/database"
 	"github.com/m50/shinidex/pkg/types"
-	cntxt "github.com/m50/shinidex/pkg/context"
 )
 
 var (
-	ErrNotAuthed = errors.New("no active session found")
+	ErrNotAuthed      = errors.New("no active session found")
 	ErrNotEchoContext = errors.New("not a valid echo context")
 )
 
@@ -79,7 +79,7 @@ func GetAuthedUser(c echo.Context) (*types.User, error) {
 	if !ok {
 		return nil, ErrNotAuthed
 	}
-	user, err := db.Users().FindByID(userID)
+	user, err := db.Users().FindByID(cntxt.FromEcho(c), userID)
 	if err != nil {
 		return nil, ErrNotAuthed
 	}

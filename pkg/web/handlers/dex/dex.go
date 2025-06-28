@@ -6,6 +6,7 @@ import (
 
 	"github.com/gookit/slog"
 	"github.com/labstack/echo/v4"
+	"github.com/m50/shinidex/pkg/context"
 	"github.com/m50/shinidex/pkg/database"
 	"github.com/m50/shinidex/pkg/types"
 	"github.com/m50/shinidex/pkg/views"
@@ -28,12 +29,13 @@ func Router(e *echo.Echo) {
 }
 
 func list(c echo.Context) error {
+	ctx := context.FromEcho(c)
 	user, err := session.GetAuthedUser(c)
 	if err != nil {
 		return err
 	}
 	db := c.(database.DBContext).DB()
-	dexes, err := db.Pokedexes().FindByOwnerID(user.ID)
+	dexes, err := db.Pokedexes().FindByOwnerID(ctx, user.ID)
 	if err != nil {
 		return err
 	}
@@ -45,6 +47,7 @@ func new(c echo.Context) error {
 }
 
 func create(c echo.Context) error {
+	ctx := context.FromEcho(c)
 	user, err := session.GetAuthedUser(c)
 	if err != nil {
 		return err
@@ -62,7 +65,7 @@ func create(c echo.Context) error {
 		return err
 	}
 	db := c.(database.DBContext).DB().Pokedexes()
-	id, err := db.Insert(dex)
+	id, err := db.Insert(ctx, dex)
 	if err != nil {
 		return err
 	}
@@ -72,9 +75,10 @@ func create(c echo.Context) error {
 }
 
 func edit(c echo.Context) error {
+	ctx := context.FromEcho(c)
 	id := c.Param("dex")
 	db := c.(database.DBContext).DB().Pokedexes()
-	dex, err := db.FindByID(id)
+	dex, err := db.FindByID(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -88,6 +92,7 @@ func edit(c echo.Context) error {
 }
 
 func update(c echo.Context) error {
+	ctx := context.FromEcho(c)
 	var f struct {
 		ID            string             `param:"dex"`
 		Name          string             `form:"name"`
@@ -102,7 +107,7 @@ func update(c echo.Context) error {
 	}
 
 	db := c.(database.DBContext).DB().Pokedexes()
-	dex, err := db.FindByID(f.ID)
+	dex, err := db.FindByID(ctx, f.ID)
 	if err != nil {
 		return err
 	}
@@ -117,7 +122,7 @@ func update(c echo.Context) error {
 		return err
 	}
 
-	if err = db.Update(dex); err != nil {
+	if err = db.Update(ctx, dex); err != nil {
 		return err
 	}
 
@@ -126,9 +131,10 @@ func update(c echo.Context) error {
 }
 
 func delete(c echo.Context) error {
+	ctx := context.FromEcho(c)
 	id := c.Param("dex")
 	db := c.(database.DBContext).DB().Pokedexes()
-	if err := db.Delete(id); err != nil {
+	if err := db.Delete(ctx, id); err != nil {
 		return err
 	}
 
