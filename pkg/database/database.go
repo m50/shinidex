@@ -2,15 +2,16 @@ package database
 
 import (
 	crand "crypto/rand"
-	"database/sql"
-	"database/sql/driver"
 	"math/big"
 	"strconv"
 	"time"
 
+	"github.com/gookit/slog"
 	"github.com/jmoiron/sqlx"
-	"github.com/m50/shinidex/pkg/config"
-	"github.com/tursodatabase/go-libsql"
+	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"
+	"github.com/spf13/viper"
+	"github.com/xo/dburl"
 )
 
 type DBContext interface {
@@ -22,32 +23,23 @@ type Database struct {
 }
 
 func NewFromLoadedConfig() (*Database, error) {
-	file := config.Loaded.DBPath
-	dbUrl := config.Loaded.TursoURL
-	authToken := config.Loaded.TursoAuthToken
-	return New(file, dbUrl, authToken)
+	return New(viper.GetString("db-url"))
 }
 
-func NewLocal(file string) (*Database, error) {
-	return New(file, "", "")
-}
-
-func New(file, dbUrl, authToken string) (*Database, error) {
-	var db *sqlx.DB
-	var err error
-	if dbUrl != "" && authToken != "" {
-		var connector driver.Connector
-		connector, err = libsql.NewEmbeddedReplicaConnector(file, dbUrl, libsql.WithAuthToken(authToken))
-		if err != nil {
-			return nil, err
-		}
-		dbi := sql.OpenDB(connector)
-		db = sqlx.NewDb(dbi, "libsql")
-	} else {
-		db, err = sqlx.Open("libsql", file)
-		if err != nil {
-			return nil, err
-		}
+func New(dbURL string) (*Database, error) {
+	url, err := dburl.Parse(dbURL)
+	if err != nil {
+		slog.Errorf("unable to parse database url: %s", err)
+		return nil, err
+	}
+	driver := url.Driver
+	if url.GoDriver != "" {
+		driver = url.GoDriver
+	}
+	db, err := sqlx.Connect(driver, url.DSN)
+	if err != nil {
+		slog.Errorf("unable to connect to database: %s", err)
+		return nil, err
 	}
 
 	return &Database{
