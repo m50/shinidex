@@ -1,6 +1,7 @@
 package session
 
 import (
+	"context"
 	"errors"
 
 	"github.com/gorilla/sessions"
@@ -8,10 +9,12 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/m50/shinidex/pkg/database"
 	"github.com/m50/shinidex/pkg/types"
+	cntxt "github.com/m50/shinidex/pkg/context"
 )
 
 var (
 	ErrNotAuthed = errors.New("no active session found")
+	ErrNotEchoContext = errors.New("not a valid echo context")
 )
 
 func New(c echo.Context, user types.User) error {
@@ -40,9 +43,21 @@ func Close(c echo.Context) error {
 	return nil
 }
 
+func IsLoggedInContext(ctx context.Context) bool {
+	return IsLoggedIn(cntxt.ToEcho(ctx))
+}
+
 func IsLoggedIn(c echo.Context) bool {
 	_, err := GetAuthedUser(c)
 	return err == nil
+}
+
+func GetAuthedUserContext(ctx context.Context) (*types.User, error) {
+	c := cntxt.ToEcho(ctx)
+	if c == nil {
+		return nil, ErrNotEchoContext
+	}
+	return GetAuthedUser(c)
 }
 
 func GetAuthedUser(c echo.Context) (*types.User, error) {

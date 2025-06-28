@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gookit/slog"
 	"github.com/labstack/echo/v4"
 	"github.com/m50/shinidex/pkg/database"
-	"github.com/m50/shinidex/pkg/logger"
 	"github.com/m50/shinidex/pkg/types"
 	"github.com/m50/shinidex/pkg/views"
 	"github.com/m50/shinidex/pkg/web/form"
@@ -67,7 +67,7 @@ func create(c echo.Context) error {
 		return err
 	}
 
-	logger.Infof("created dex %s [%s]", dex.ID, dex.Name)
+	slog.Infof("created dex %s [%s]", dex.ID, dex.Name)
 	return c.Redirect(http.StatusMovedPermanently, fmt.Sprintf("/dex/%s", id))
 }
 
@@ -121,7 +121,7 @@ func update(c echo.Context) error {
 		return err
 	}
 
-	logger.Infof("updated dex %s [%s]", dex.ID, dex.Name)
+	slog.Infof("updated dex %s [%s]", dex.ID, dex.Name)
 	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/dex/%s", f.ID))
 }
 
@@ -132,6 +132,6 @@ func delete(c echo.Context) error {
 		return err
 	}
 
-	logger.Infof("deleted dex %s", id)
+	slog.Infof("deleted dex %s", id)
 	return c.Redirect(http.StatusSeeOther, "/dex/")
 }

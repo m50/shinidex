@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/m50/shinidex/pkg/logger"
+	"github.com/gookit/slog"
 )
 
 const migrationSchema = `
@@ -26,9 +26,9 @@ func (db *Database) Migrate(path string) error {
 	}
 	_, err = db.conn.Exec("SELECT * FROM migrations;")
 	if err != nil {
-		logger.Warnf("failed to get migration list, attempting to deploy schema, %v", err)
+		slog.Warnf("failed to get migration list, attempting to deploy schema, %v", err)
 		if _, err = db.conn.Exec(migrationSchema); err != nil {
-			logger.Warnf("possible failure in migrating: %v", err)
+			slog.Warnf("possible failure in migrating: %v", err)
 		}
 	}
 
@@ -42,7 +42,7 @@ func (db *Database) Migrate(path string) error {
 		if res == 1 {
 			continue
 		}
-		logger.Info("Migrating " + f.Name() + "...")
+		slog.Info("Migrating " + f.Name() + "...")
 
 		sql, err := os.ReadFile(path + "/" + f.Name())
 		if err != nil {

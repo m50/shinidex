@@ -5,7 +5,9 @@ import (
 	"net/http"
 
 	"github.com/a-h/templ"
+	"github.com/gookit/slog"
 	"github.com/labstack/echo/v4"
+	"github.com/m50/shinidex/pkg/context"
 	"github.com/m50/shinidex/pkg/web/session"
 )
 
@@ -14,7 +16,7 @@ func renderWrappedView(ctx echo.Context, t templ.Component) error {
 	v, ok := ctx.Get("rendersPokemon").(bool)
 	rendersPkmn := ok && v
 	base := BaseLayout(user, rendersPkmn)
-	children := templ.WithChildren(ctx.Request().Context(), t)
+	children := templ.WithChildren(context.FromEcho(ctx), t)
 	return base.Render(children, ctx.Response().Writer)
 }
 
@@ -23,17 +25,16 @@ func RenderErrorWithCode(ctx echo.Context, status int, err error) error {
 }
 
 func RenderError(ctx echo.Context, err error) error {
-	ctx.Logger().Error(err)
+	slog.WithContext(context.FromEcho(ctx)).Error(err)
 	return RenderErrorWithCode(ctx, http.StatusInternalServerError, err)
 }
 
 func AddView(ctx echo.Context, t templ.Component) error {
-	return t.Render(ctx.Request().Context(), ctx.Response().Writer)
+	return t.Render(context.FromEcho(ctx), ctx.Response().Writer)
 }
 
 func RenderView(ctx echo.Context, status int, cmpts ...templ.Component) error {
 	ctx.Response().WriteHeader(status)
-	ctx.Response().Writer.WriteHeader(status)
 	var err error
 	for idx, cmpt := range cmpts {
 		if idx == 0 && ctx.Request().Header.Get("hx-request") != "true" {
@@ -50,7 +51,7 @@ func RenderView(ctx echo.Context, status int, cmpts ...templ.Component) error {
 
 func ToStr(ctx echo.Context, t templ.Component) (string, error) {
 	b := new(bytes.Buffer)
-	if err := t.Render(ctx.Request().Context(), b); err != nil {
+	if err := t.Render(context.FromEcho(ctx), b); err != nil {
 		return "", err
 	}
 	return b.String(), nil
