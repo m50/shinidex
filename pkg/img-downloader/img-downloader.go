@@ -9,19 +9,19 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gookit/slog"
 	"github.com/m50/shinidex/pkg/database"
-	"github.com/m50/shinidex/pkg/logger"
 	"github.com/m50/shinidex/pkg/types"
 )
 
 func DownloadImages(db *database.Database) {
 	pokemon, err := db.Pokemon().GetAllAsSeparateForms()
 	if err != nil {
-		logger.Error("Failed to fetch pokemon images: ", err)
+		slog.Error("Failed to fetch pokemon images: ", err)
 		return
 	}
 
-	logger.Info("Preparing download of pokemon images...")
+	slog.Info("Preparing download of pokemon images...")
 	wg := &sync.WaitGroup{}
 	wg.Add(len(pokemon))
 	for idx, pkmn := range pokemon {
@@ -39,29 +39,29 @@ func DownloadImages(db *database.Database) {
 
 	wg.Wait()
 
-	logger.Info("Done")
+	slog.Info("Done")
 }
 
 func downloadPokemonImages(wg *sync.WaitGroup, pkmn types.Pokemon) {
 	// First get normal image
-	logger.Debugf("Downloading normal image for %s...", pkmn.ID)
+	slog.Debugf("Downloading normal image for %s...", pkmn.ID)
 	localPath := pkmn.GetLocalImagePath(false)
 	foreignPath := pkmn.GetImageURL(false)
 	if err := fetchImage(foreignPath, localPath); err != nil {
-		logger.Errorf("Unable to fetch normal local image for pokemon [%s]: %s", pkmn.ID, err)
+		slog.Errorf("Unable to fetch normal local image for pokemon [%s]: %s", pkmn.ID, err)
 		wg.Done()
 	}
-	logger.Infof("Downloaded normal image for %s", pkmn.ID)
+	slog.Infof("Downloaded normal image for %s", pkmn.ID)
 
 	// Now get shiny
-	logger.Debugf("Downloading shiny image for %s...", pkmn.ID)
+	slog.Debugf("Downloading shiny image for %s...", pkmn.ID)
 	localPath = pkmn.GetLocalImagePath(true)
 	foreignPath = pkmn.GetImageURL(true)
 	if err := fetchImage(foreignPath, localPath); err != nil {
-		logger.Errorf("Unable to fetch shiny local image for pokemon [%s]: %s", pkmn.ID, err)
+		slog.Errorf("Unable to fetch shiny local image for pokemon [%s]: %s", pkmn.ID, err)
 		wg.Done()
 	}
-	logger.Infof("Downloaded shiny image for %s", pkmn.ID)
+	slog.Infof("Downloaded shiny image for %s", pkmn.ID)
 
 	// Done
 	wg.Done()

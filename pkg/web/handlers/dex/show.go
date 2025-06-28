@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"slices"
 
+	"github.com/gookit/slog"
 	"github.com/labstack/echo/v4"
 	"github.com/m50/shinidex/pkg/database"
-	"github.com/m50/shinidex/pkg/logger"
 	"github.com/m50/shinidex/pkg/types"
 	"github.com/m50/shinidex/pkg/views"
 )
@@ -110,9 +110,9 @@ func boxCatch(c echo.Context) error {
 
 		pkmnID, formID := pkmn.IDParts()
 		if err = db.Pokedexes().Entries().Catch(dex.ID, pkmnID, formID); err != nil {
-			logger.Error(f.PKMN[idx], ": ", err, "; likely already marked as caught")
+			slog.Error(f.PKMN[idx], ": ", err, "; likely already marked as caught")
 		} else {
-			logger.Infof("%s: caught for dex %s", pkmn.ID, dex.ID)
+			slog.Infof("%s: caught for dex %s", pkmn.ID, dex.ID)
 		}
 		if !pkmn.ShinyLocked {
 			pkmn.Caught = true
@@ -120,7 +120,7 @@ func boxCatch(c echo.Context) error {
 		pkmnList[idx] = pkmn
 	}
 
-	return views.RenderView(c, http.StatusOK, 
+	return views.RenderView(c, http.StatusOK,
 		Box(dex, f.Box, pkmnList),
 		views.Info("Caught", fmt.Sprintf("You caught everything in box %d! Impressive!", f.Box)),
 	)
@@ -143,7 +143,7 @@ func catch(c echo.Context) error {
 	}
 	if !pkmn.ShinyLocked {
 		pkmn.Caught = true
-		logger.Infof("%s caught for dex %s", pkmn.ID, dex.ID)
+		slog.Infof("%s caught for dex %s", pkmn.ID, dex.ID)
 	}
 
 	return views.RenderView(c, http.StatusOK,
@@ -168,7 +168,7 @@ func release(c echo.Context) error {
 		return err
 	}
 	pkmn.Caught = false
-	logger.Infof("%s released for dex %s", pkmn.ID, dex.ID)
+	slog.Infof("%s released for dex %s", pkmn.ID, dex.ID)
 
 	return views.RenderView(c, http.StatusOK,
 		Pokemon(dex, pkmn),

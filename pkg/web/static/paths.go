@@ -6,7 +6,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/m50/shinidex/pkg/logger"
+	"github.com/gookit/slog"
 )
 
 const scriptFSPath = "assets/scripts.js"
@@ -14,7 +14,7 @@ const styleFSPath = "assets/style.css"
 
 var (
 	versionedScriptPath = ""
-	versionedStylePath = ""
+	versionedStylePath  = ""
 )
 
 func init() {
@@ -24,12 +24,12 @@ func init() {
 }
 
 func GetScriptPath() string {
-	if (versionedScriptPath != "") {
+	if versionedScriptPath != "" {
 		return versionedScriptPath
 	}
 	h, err := getFileHash(scriptFSPath)
 	if err != nil {
-		logger.Warnf("unable to generate versioned script path: %v", err)
+		slog.Warnf("unable to generate versioned script path: %v", err)
 		return "/assets/scripts.js"
 	}
 	versionedScriptPath = fmt.Sprintf("/assets/scripts.%s.js", h)
@@ -42,7 +42,7 @@ func GetStylePath() string {
 	}
 	h, err := getFileHash(styleFSPath)
 	if err != nil {
-		logger.Warnf("unable to generate versioned style path: %v", err)
+		slog.Warnf("unable to generate versioned style path: %v", err)
 		return "/assets/style.css"
 	}
 	versionedStylePath = fmt.Sprintf("/assets/style.%s.css", h)

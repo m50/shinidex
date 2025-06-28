@@ -27,6 +27,7 @@ func init() {
 	flags.StringVar(&cfgFile, "config", "", "config file (default: './config.yml' or '/config.yml')")
 	flags.String("logging.level", "INFO", "log level (default: 'INFO')")
 	flags.Bool("logging.access-logs", false, "enabled access logs (default: false)")
+	flags.String("logging.format", "text", "format of logs (default: 'text'; options: 'text', 'json')")
 	flags.String("listen-address", ":1343", "the address to listen to (default: ':1343')")
 	flags.String("db-url", "sqlite://file:./database.db", "the connection url for the database (default: 'sqlite://file:./database.db')")
 	flags.BytesHex("auth.key", make([]byte, 32), "they key to be used for signing sessions (default: Regens every run)")

@@ -6,6 +6,7 @@ import (
 	"os"
 	"slices"
 	"strings"
+	"time"
 
 	"github.com/m50/shinidex/pkg/math"
 )
@@ -14,8 +15,8 @@ type User struct {
 	ID       string
 	Email    string
 	Password string
-	Created  int64
-	Updated  int64
+	Created  time.Time
+	Updated  time.Time
 }
 
 type Generation uint8
@@ -251,7 +252,7 @@ type PokedexConfig struct {
 	GenderForms   FormLocation
 	RegionalForms FormLocation
 	GMaxForms     FormLocation
-	set bool
+	set           bool
 }
 
 func (p Pokedex) GetConfig() (PokedexConfig, error) {
