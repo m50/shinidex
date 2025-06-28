@@ -14,7 +14,9 @@ func Run(cmd *cobra.Command, args []string) {
 	logfmt := viper.GetString("logging.format")
 	switch logfmt {
 	case "text":
-		slog.SetFormatter(slog.NewTextFormatter())
+		formatter := slog.NewTextFormatter()
+		formatter.EnableColor = true
+		slog.SetFormatter(formatter)
 	case "json":
 		slog.SetFormatter(slog.NewJSONFormatter())
 	}
