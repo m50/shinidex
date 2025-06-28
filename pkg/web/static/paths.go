@@ -15,12 +15,14 @@ const styleFSPath = "assets/style.css"
 var (
 	versionedScriptPath = ""
 	versionedStylePath  = ""
+	inInit              = true
 )
 
 func init() {
 	// Call the get methods on init, so that we can cache the versioned names
 	GetScriptPath()
 	GetStylePath()
+	inInit = false
 }
 
 func GetScriptPath() string {
@@ -29,7 +31,9 @@ func GetScriptPath() string {
 	}
 	h, err := getFileHash(scriptFSPath)
 	if err != nil {
-		slog.Warnf("unable to generate versioned script path: %v", err)
+		if !inInit {
+			slog.Warnf("unable to generate versioned script path: %v", err)
+		}
 		return "/assets/scripts.js"
 	}
 	versionedScriptPath = fmt.Sprintf("/assets/scripts.%s.js", h)
@@ -42,7 +46,9 @@ func GetStylePath() string {
 	}
 	h, err := getFileHash(styleFSPath)
 	if err != nil {
-		slog.Warnf("unable to generate versioned style path: %v", err)
+		if !inInit {
+			slog.Warnf("unable to generate versioned style path: %v", err)
+		}
 		return "/assets/style.css"
 	}
 	versionedStylePath = fmt.Sprintf("/assets/style.%s.css", h)
