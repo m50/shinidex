@@ -70,7 +70,7 @@ func create(c echo.Context) error {
 		return err
 	}
 
-	slog.Infof("created dex %s [%s]", dex.ID, dex.Name)
+	slog.WithContext(ctx).Infof("created dex %s [%s]", dex.ID, dex.Name)
 	return c.Redirect(http.StatusMovedPermanently, fmt.Sprintf("/dex/%s", id))
 }
 
@@ -126,7 +126,7 @@ func update(c echo.Context) error {
 		return err
 	}
 
-	slog.Infof("updated dex %s [%s]", dex.ID, dex.Name)
+	slog.WithContext(ctx).Infof("updated dex %s [%s]", dex.ID, dex.Name)
 	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/dex/%s", f.ID))
 }
 
@@ -138,6 +138,6 @@ func delete(c echo.Context) error {
 		return err
 	}
 
-	slog.Infof("deleted dex %s", id)
+	slog.WithContext(ctx).Infof("deleted dex %s", id)
 	return c.Redirect(http.StatusSeeOther, "/dex/")
 }

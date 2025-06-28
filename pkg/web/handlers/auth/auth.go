@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gookit/slog"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/m50/shinidex/pkg/context"
@@ -77,7 +78,7 @@ func register(c echo.Context) error {
 	}
 
 	if err := session.New(c, user); err != nil {
-		c.Logger().Error(err)
+		slog.WithContext(ctx).Error(err)
 		return views.RenderError(c, err)
 	}
 
@@ -102,11 +103,12 @@ func login(c echo.Context) error {
 	}
 
 	if err := passwords.ComparePasswords(user.Password, c.FormValue("password")); err != nil {
+		slog.WithContext(ctx).Error(err)
 		return views.RenderView(c, http.StatusForbidden, LoginForm(), views.Error(err))
 	}
 
 	if err := session.New(c, user); err != nil {
-		c.Logger().Error(err)
+		slog.WithContext(ctx).Error(err)
 		return views.RenderView(c, http.StatusInternalServerError, LoginForm(),
 			views.Error(err))
 	}

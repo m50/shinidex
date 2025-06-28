@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"regexp"
 	"time"
 
@@ -12,7 +13,7 @@ import (
 )
 
 const (
-	keyTimeTaken = "milliseconds"
+	keyTimeTaken = "TimeTaken"
 )
 
 var (
@@ -38,8 +39,8 @@ func LoggingHandler() func(echo.HandlerFunc) echo.HandlerFunc {
 			}
 			log := slog.
 				WithContext(context.FromEcho(c)).
-				WithData(slog.M{
-					keyTimeTaken: time.Since(start).Milliseconds(),
+				AddData(slog.M{
+					keyTimeTaken: fmt.Sprintf("%dms", time.Since(start).Milliseconds()),
 				})
 			if e != nil {
 				log.Errorf("%s %s: %v %v", c.Request().Method, c.Request().RequestURI, status, e)

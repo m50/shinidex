@@ -113,9 +113,9 @@ func boxCatch(c echo.Context) error {
 
 		pkmnID, formID := pkmn.IDParts()
 		if err = db.Pokedexes().Entries().Catch(ctx, dex.ID, pkmnID, formID); err != nil {
-			slog.Error(f.PKMN[idx], ": ", err, "; likely already marked as caught")
+			slog.WithContext(ctx).Error(f.PKMN[idx], ": ", err, "; likely already marked as caught")
 		} else {
-			slog.Infof("%s: caught for dex %s", pkmn.ID, dex.ID)
+			slog.WithContext(ctx).Infof("%s: caught for dex %s", pkmn.ID, dex.ID)
 		}
 		if !pkmn.ShinyLocked {
 			pkmn.Caught = true
@@ -147,7 +147,7 @@ func catch(c echo.Context) error {
 	}
 	if !pkmn.ShinyLocked {
 		pkmn.Caught = true
-		slog.Infof("%s caught for dex %s", pkmn.ID, dex.ID)
+		slog.WithContext(ctx).Infof("%s caught for dex %s", pkmn.ID, dex.ID)
 	}
 
 	return views.RenderView(c, http.StatusOK,
@@ -173,7 +173,7 @@ func release(c echo.Context) error {
 		return err
 	}
 	pkmn.Caught = false
-	slog.Infof("%s released for dex %s", pkmn.ID, dex.ID)
+	slog.WithContext(ctx).Infof("%s released for dex %s", pkmn.ID, dex.ID)
 
 	return views.RenderView(c, http.StatusOK,
 		Pokemon(dex, pkmn),

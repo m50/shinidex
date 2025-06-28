@@ -53,8 +53,8 @@ func New(db *database.Database) *echo.Echo {
 			return next(cc)
 		}
 	})
-	e.Use(smiddleware.ErrorHandler)
 	e.Use(smiddleware.LoggingHandler())
+	e.Use(smiddleware.ErrorHandler)
 	e.Use(middleware.Recover())
 	e.Use(middleware.Gzip())
 	e.Use(middleware.Secure())
