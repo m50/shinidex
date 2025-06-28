@@ -25,7 +25,7 @@ COPY cmd/ ./cmd/
 COPY pkg/ ./pkg/
 
 RUN go tool templ generate
-RUN CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -o main ./cmd/main/main.go
+RUN go build -o main ./cmd/main/main.go
 
 FROM gcr.io/distroless/cc-debian12
 
@@ -33,7 +33,6 @@ WORKDIR /app
 
 COPY --from=go-builder /app/main ./
 COPY --from=js-builder /app/assets/ ./assets/
-COPY migrations/ ./migrations/
 COPY icons/ ./icons/
 
 EXPOSE 1323
