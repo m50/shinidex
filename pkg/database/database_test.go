@@ -1,7 +1,6 @@
 package database
 
 import (
-	"os"
 	"sort"
 	"testing"
 	"time"
@@ -12,10 +11,9 @@ import (
 
 func SetupDB(t *testing.T) *Database {
 	t.Helper()
-	d, _ := os.Getwd()
 	db, err := New("sqlite::memory:")
 	assert.Nil(t, err, "There is an error creating in memory database %s", err)
-	err = db.Migrate(d + "/../../migrations")
+	err = db.Migrate()
 	assert.Nil(t, err, "There is an error migrating ", err)
 
 	return db
