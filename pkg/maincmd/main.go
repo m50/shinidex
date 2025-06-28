@@ -6,6 +6,7 @@ import (
 	"github.com/gookit/slog"
 	"github.com/m50/shinidex/pkg/database"
 	imgdownloader "github.com/m50/shinidex/pkg/img-downloader"
+	"github.com/m50/shinidex/pkg/logger"
 	"github.com/m50/shinidex/pkg/web"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -22,6 +23,7 @@ func Run(cmd *cobra.Command, args []string) {
 	case "json":
 		slog.SetFormatter(slog.NewJSONFormatter())
 	}
+	slog.AddProcessor(logger.ContextProcessor{})
 
 	db, err := database.NewFromLoadedConfig()
 	if err != nil {
