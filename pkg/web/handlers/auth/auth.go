@@ -8,19 +8,19 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/m50/shinidex/pkg/config"
 	"github.com/m50/shinidex/pkg/database"
 	"github.com/m50/shinidex/pkg/database/passwords"
 	"github.com/m50/shinidex/pkg/types"
 	"github.com/m50/shinidex/pkg/views"
 	smiddleware "github.com/m50/shinidex/pkg/web/middleware"
 	"github.com/m50/shinidex/pkg/web/session"
+	"github.com/spf13/viper"
 )
 
 func Router(e *echo.Echo) {
 	group := e.Group("/auth")
 
-	if !config.Loaded.DisallowRegistration {
+	if !viper.GetBool("auth.disable-registration") {
 		group.GET("/register", registerForm)
 		group.POST("/register", register, middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
 	}

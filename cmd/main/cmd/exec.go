@@ -26,12 +26,17 @@ func init() {
 	cobra.OnInitialize(initConfig)
 	flags := rootCmd.PersistentFlags()
 	flags.StringVar(&cfgFile, "config", "", "config file (default: './config.yml' or '/config.yml')")
-	flags.String("logging.level", "INFO", "log level (default: 'INFO')")
-	flags.Bool("logging.access-logs", false, "enabled access logs (default: false)")
-	flags.String("logging.format", "text", "format of logs (default: 'text'; options: 'text', 'json')")
-	flags.String("listen-address", ":1343", "the address to listen to (default: ':1343')")
+	flags.String("listen-address", ":1323", "the address to listen to (default: ':1323')")
 	flags.String("db-url", "sqlite://database.db", "the connection url for the database (default: 'sqlite://file:./database.db')")
-	flags.BytesHex("auth.key", make([]byte, 32), "they key to be used for signing sessions (default: Regens every run)")
+
+	flags.String("logs.level", "INFO", "log level (default: 'INFO')")
+	flags.String("logs.format", "text", "format of logs (default: 'text'; options: 'text', 'json')")
+	flags.Bool("logs.access", false, "enable access logs (default: false)")
+	flags.Bool("logs.static-access", false, "enable access logs for static files, i.e. images (default: false)")
+
+	flags.String("auth.key", string(make([]byte, 32)), "they key to be used for signing sessions (default: Regens every run)")
+	flags.Bool("auth.disable-registration", false, "disable registration (default: false)")
+
 	cobra.CheckErr(viper.BindPFlags(flags))
 }
 

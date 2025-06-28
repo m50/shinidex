@@ -7,7 +7,6 @@ import (
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/m50/shinidex/pkg/config"
 	"github.com/m50/shinidex/pkg/database"
 	"github.com/m50/shinidex/pkg/views"
 	"github.com/m50/shinidex/pkg/web/handlers/auth"
@@ -54,16 +53,12 @@ func New(db *database.Database) *echo.Echo {
 			return next(cc)
 		}
 	})
-	if viper.GetBool("logging.access-logs") {
-		e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-			Format: "[${time_rfc3339}] \x1b[34mRQST\x1b[0m ${method} http://${host}${uri} : ${status} ${error}\n",
-		}))
-	}
 	e.Use(smiddleware.ErrorHandler)
+	e.Use(smiddleware.LoggingHandler())
 	e.Use(middleware.Recover())
 	e.Use(middleware.Gzip())
 	e.Use(middleware.Secure())
-	e.Use(session.Middleware(sessions.NewCookieStore(config.Loaded.AuthKey)))
+	e.Use(session.Middleware(sessions.NewCookieStore([]byte(viper.GetString("auth.key")))))
 	e.Use(middleware.CORS())
 	e.Use(smiddleware.HeaderMiddleware)
 
