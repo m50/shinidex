@@ -27,7 +27,7 @@ func init() {
 	flags := rootCmd.PersistentFlags()
 	flags.StringVar(&cfgFile, "config", "", "config file (default: './config.yml' or '/config.yml')")
 	flags.String("listen-address", ":1323", "the address to listen to (default: ':1323')")
-	flags.String("db-url", "sqlite://database.db", "the connection url for the database (default: 'sqlite://file:./database.db')")
+	flags.String("db-url", "sqlite://database.db", "the connection url for the database (default: 'sqlite://./database.db')")
 
 	flags.String("logs.level", "INFO", "log level (default: 'INFO')")
 	flags.String("logs.format", "text", "format of logs (default: 'text'; options: 'text', 'json')")

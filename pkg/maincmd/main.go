@@ -13,8 +13,8 @@ import (
 )
 
 func Run(cmd *cobra.Command, args []string) {
-	slog.SetLevelByName(viper.GetString("logging.level"))
-	logfmt := viper.GetString("logging.format")
+	slog.SetLevelByName(viper.GetString("logs.level"))
+	logfmt := viper.GetString("logs.format")
 	switch logfmt {
 	case "text":
 		formatter := slog.NewTextFormatter()

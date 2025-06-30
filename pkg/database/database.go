@@ -27,6 +27,7 @@ func NewFromLoadedConfig() (*Database, error) {
 }
 
 func New(dbURL string) (*Database, error) {
+	slog.Debugf("connecting to database at %v", dbURL)
 	url, err := dburl.Parse(dbURL)
 	if err != nil {
 		slog.Errorf("unable to parse database url: %s", err)
