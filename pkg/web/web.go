@@ -20,6 +20,7 @@ import (
 type Context struct {
 	echo.Context
 	db *database.Database
+	
 }
 
 func (c Context) DB() *database.Database {

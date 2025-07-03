@@ -2,6 +2,8 @@ package database
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -26,6 +28,22 @@ func (db UserDB) FindByEmail(ctx context.Context, email string) (types.User, err
 	user := types.User{}
 	err := db.conn.GetContext(ctx, &user, "SELECT * FROM users WHERE email = $1", email)
 	return user, err
+}
+
+func (db UserDB) FindOrMake(ctx context.Context, user types.User) (types.User, error) {
+	u, err := db.FindByEmail(ctx, user.Email)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return user, err
+	}
+	if err != nil && errors.Is(err, sql.ErrNoRows) {
+		id, err := db.Insert(ctx, user)
+		if err != nil {
+			return user, err
+		}
+
+		return db.FindByID(ctx, id)
+	}
+	return u, nil
 }
 
 func (db UserDB) Insert(ctx context.Context, user types.User) (string, error) {

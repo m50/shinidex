@@ -12,6 +12,7 @@ import (
 	"github.com/m50/shinidex/pkg/context"
 	"github.com/m50/shinidex/pkg/database"
 	"github.com/m50/shinidex/pkg/database/passwords"
+	"github.com/m50/shinidex/pkg/oidc"
 	"github.com/m50/shinidex/pkg/types"
 	"github.com/m50/shinidex/pkg/views"
 	smiddleware "github.com/m50/shinidex/pkg/web/middleware"
@@ -29,6 +30,8 @@ func Router(e *echo.Echo) {
 
 	group.GET("/login", loginForm)
 	group.POST("/login", login, middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
+
+	oidcRouter(group)
 
 	group.POST("/logout", logout, smiddleware.AuthnMiddleware)
 }
@@ -86,7 +89,10 @@ func register(c echo.Context) error {
 }
 
 func loginForm(c echo.Context) error {
-	return views.RenderView(c, http.StatusOK, LoginForm())
+	if viper.GetBool(oidc.KeyDisablePassword) {
+		return c.Redirect(http.StatusMovedPermanently, c.Echo().Reverse(oidc.PathNameOIDCLogin))
+	}
+	return views.RenderView(c, http.StatusOK, LoginForm(c))
 }
 
 func login(c echo.Context) error {
@@ -95,21 +101,21 @@ func login(c echo.Context) error {
 	email := c.FormValue("email")
 	user, err := db.Users().FindByEmail(ctx, email)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		return views.RenderView(c, http.StatusInternalServerError, LoginForm(),
+		return views.RenderView(c, http.StatusInternalServerError, LoginForm(c),
 			views.Error(err))
 	} else if errors.Is(err, sql.ErrNoRows) {
-		return views.RenderView(c, http.StatusForbidden, LoginForm(),
+		return views.RenderView(c, http.StatusForbidden, LoginForm(c),
 			views.Error(fmt.Errorf("no account found for %s", email)))
 	}
 
 	if err := passwords.ComparePasswords(user.Password, c.FormValue("password")); err != nil {
 		slog.WithContext(ctx).Error(err)
-		return views.RenderView(c, http.StatusForbidden, LoginForm(), views.Error(err))
+		return views.RenderView(c, http.StatusForbidden, LoginForm(c), views.Error(err))
 	}
 
 	if err := session.New(c, user); err != nil {
 		slog.WithContext(ctx).Error(err)
-		return views.RenderView(c, http.StatusInternalServerError, LoginForm(),
+		return views.RenderView(c, http.StatusInternalServerError, LoginForm(c),
 			views.Error(err))
 	}
 

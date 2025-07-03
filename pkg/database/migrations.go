@@ -43,7 +43,7 @@ func (db *Database) Migrate() error {
 		if res == 1 {
 			continue
 		}
-		slog.Debugf("Migrating %s...", f.Name())
+		slog.Debugf("migrating %s...", f.Name())
 
 		sql, err := migrationFS.ReadFile("migrations/" + f.Name())
 		if err != nil {
