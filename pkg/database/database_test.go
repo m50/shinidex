@@ -28,9 +28,9 @@ func TestGenerateId(t *testing.T) {
 func TestGenerateIdSequential(t *testing.T) {
 	t.Parallel()
 	ids := make([]string, 1000)
-	for i := 0; i < 1000; i++ {
+	for i := range 1000 {
 		ids[i] = generateId()
-		<-time.After(time.Millisecond)
+		time.Sleep(time.Millisecond)
 	}
 	assert.True(t, sort.StringsAreSorted(ids), "Strings are not sorted")
 }
