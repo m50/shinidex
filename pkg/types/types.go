@@ -74,6 +74,8 @@ func (p PokemonList) StandardForms() PokemonList {
 	})
 }
 
+const IDSeparator = "_"
+
 type Pokemon struct {
 	ID                string
 	NationalDexNumber int `db:"national_dex_number"`
@@ -84,7 +86,7 @@ type Pokemon struct {
 }
 
 func (p Pokemon) IDParts() (pokemonID, formID string) {
-	parts := strings.Split(p.ID, "+")
+	parts := strings.Split(p.ID, IDSeparator)
 	pokemonID = parts[0]
 	if len(parts) > 1 {
 		formID = parts[1]
@@ -115,7 +117,7 @@ func (p Pokemon) IsStandardForm() bool {
 	if p.IsFemale() || p.IsGMax() || p.IsRegional() {
 		return false
 	}
-	return strings.Contains(p.ID, "+")
+	return strings.Contains(p.ID, IDSeparator)
 }
 
 func (p Pokemon) Generation() Generation {
@@ -143,7 +145,7 @@ func (p Pokemon) Generation() Generation {
 }
 
 func (p Pokemon) GetLocalImagePath(shiny bool) string {
-	id := strings.Replace(p.ID, "+", "-", 1)
+	id := strings.Replace(p.ID, IDSeparator, "-", 1)
 	id, _ = strings.CutSuffix(id, "-antique")
 	id, _ = strings.CutSuffix(id, "-masterpiece")
 	id, _ = strings.CutSuffix(id, "-artisan")
@@ -159,7 +161,7 @@ func (p Pokemon) GetLocalImagePath(shiny bool) string {
 }
 
 func (p Pokemon) GetImageURL(shiny bool) string {
-	id := strings.Replace(p.ID, "+", "-", 1)
+	id := strings.Replace(p.ID, IDSeparator, "-", 1)
 	id, _ = strings.CutSuffix(id, "-antique")
 	id, _ = strings.CutSuffix(id, "-masterpiece")
 	id, _ = strings.CutSuffix(id, "-artisan")

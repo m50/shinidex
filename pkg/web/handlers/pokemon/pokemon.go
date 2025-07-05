@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/m50/shinidex/pkg/context"
 	"github.com/m50/shinidex/pkg/database"
+	"github.com/m50/shinidex/pkg/search"
 	"github.com/m50/shinidex/pkg/views"
 	"github.com/m50/shinidex/pkg/web/form"
 )
@@ -14,8 +15,10 @@ import (
 func Router(e *echo.Echo) {
 	group := e.Group("/pokemon")
 
-	group.GET("", list).Name = "pokemon-list"
+	group.GET("", list).Name = "pokemon.list"
 	group.GET("/box/:box", box)
+
+	group.GET("/api/search", searchAPI).Name = "pokemon.search"
 }
 
 func list(c echo.Context) error {
@@ -45,4 +48,12 @@ func box(c echo.Context) error {
 	}
 	shiny := form.ParseBool(c.FormValue("shiny"))
 	return views.RenderView(c, http.StatusOK, Box(pageNum, pkmn, shiny))
+}
+
+func searchAPI(c echo.Context) error {
+	ctx := context.FromEcho(c)
+	s := c.QueryParam("s")
+	search := c.(search.Context).Search()
+	pkmnID := search.Get(ctx, s)
+	return c.JSON(http.StatusOK, map[string]string{"found": pkmnID})
 }

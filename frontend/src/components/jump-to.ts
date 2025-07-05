@@ -3,11 +3,10 @@ import { delay } from "../functions"
 const pathRegexp = /\/dex\/(?!new|\w+\/edit)\w+|\/pokemon/
 
 export default () => {
-    console.log(pathRegexp.test(document.location.href))
     const jumpTo = (document.getElementById('jump-to') as HTMLInputElement)
     const app = document.getElementById('app')
     if (!jumpTo) {
-        console.log("unable to find jumpTo")
+        console.error("unable to find jumpTo")
         return
     }
 
@@ -31,7 +30,6 @@ export default () => {
 }
 
 const changeEvent = (jumpTo: HTMLInputElement) => (e: Event) => {
-    console.log(isKeyboardEvent(e), isKeyboardEvent(e) && e.key)
     if (!isKeyboardEvent(e) || (isKeyboardEvent(e) && e.key == "Enter")) {
         e.preventDefault()
     }
@@ -50,8 +48,9 @@ function setQueryParam(value: string) {
     history.pushState(null, '', url);
 }
 
-function findPokemon(value: string) {
+async function findPokemon(value: string) {
     value = value.toLocaleLowerCase()
+    value = await doSearch(value)
     const pkmn = document.getElementById(value)
     if (!pkmn) return 
     pkmn.scrollIntoView({
@@ -59,11 +58,17 @@ function findPokemon(value: string) {
         block: "center",
     })
     pkmn.classList.add("bg-indigo-300")
-    delay(3000).then(() => {
-        pkmn.classList.remove("bg-indigo-300")
-    })
+    await delay(3000)
+    pkmn.classList.remove("bg-indigo-300")
 }
 
 function isKeyboardEvent(e: Event | KeyboardEvent): e is KeyboardEvent {
     return (typeof((e as KeyboardEvent).key) != "undefined") 
+}
+
+async function doSearch(text: string): Promise<string> {
+    const resp = await fetch("/pokemon/api/search?s="+text)
+    const body = await resp.json()
+    const { found } = body
+    return found
 }

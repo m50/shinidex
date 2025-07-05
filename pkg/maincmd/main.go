@@ -10,6 +10,7 @@ import (
 	imgdownloader "github.com/m50/shinidex/pkg/img-downloader"
 	"github.com/m50/shinidex/pkg/logger"
 	"github.com/m50/shinidex/pkg/oidc"
+	"github.com/m50/shinidex/pkg/search"
 	"github.com/m50/shinidex/pkg/web"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -42,6 +43,9 @@ func Run(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	srch := search.New(db)
+	go srch.Prepare(ctx)
+
 	go func() {
 		for {
 			if err := oidc.Initialize(ctx); err != nil {
@@ -55,7 +59,7 @@ func Run(cmd *cobra.Command, args []string) {
 	}()
 	go imgdownloader.DownloadImages(ctx, db)
 
-	e := web.New(db)
+	e := web.New(db, srch)
 	if err := e.Start(viper.GetString("listen-address")); err != nil {
 		slog.Fatal(err)
 		os.Exit(1)

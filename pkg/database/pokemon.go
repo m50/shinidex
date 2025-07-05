@@ -65,7 +65,7 @@ func (db PokemonFormsDB) FindByID(ctx context.Context, pokemonID string, formID 
 }
 
 func (db PokemonDB) FindByFullFormID(ctx context.Context, fullFormID string) (types.Pokemon, error) {
-	parts := strings.Split(fullFormID, "+")
+	parts := strings.Split(fullFormID, types.IDSeparator)
 	pkmn, err := db.FindByID(ctx, parts[0])
 	if err != nil || len(parts) == 1 {
 		return pkmn, err
@@ -75,7 +75,7 @@ func (db PokemonDB) FindByFullFormID(ctx context.Context, fullFormID string) (ty
 		return types.Pokemon{}, err
 	}
 	return types.Pokemon{
-		ID:                pkmn.ID + "+" + f.ID,
+		ID:                pkmn.ID + types.IDSeparator + f.ID,
 		Name:              fmt.Sprintf("%s (%s)", pkmn.Name, f.Name),
 		NationalDexNumber: pkmn.NationalDexNumber,
 		ShinyLocked:       f.ShinyLocked,
@@ -103,7 +103,7 @@ func (db PokemonDB) GetAllAsSeparateForms(ctx context.Context) (types.PokemonLis
 			}
 			c++
 			result[c] = types.Pokemon{
-				ID:                pkmn.ID + "+" + f.ID,
+				ID:                pkmn.ID + types.IDSeparator + f.ID,
 				Name:              fmt.Sprintf("%s (%s)", pkmn.Name, f.Name),
 				NationalDexNumber: pkmn.NationalDexNumber,
 				ShinyLocked:       f.ShinyLocked,

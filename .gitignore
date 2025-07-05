@@ -7,3 +7,4 @@ tmp/
 config.yml
 .vscode/
 docker-compose.yaml
+data.ms

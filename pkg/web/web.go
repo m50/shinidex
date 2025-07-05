@@ -8,6 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/m50/shinidex/pkg/database"
+	"github.com/m50/shinidex/pkg/search"
 	"github.com/m50/shinidex/pkg/views"
 	"github.com/m50/shinidex/pkg/web/handlers/auth"
 	"github.com/m50/shinidex/pkg/web/handlers/dex"
@@ -20,18 +21,21 @@ import (
 type Context struct {
 	echo.Context
 	db *database.Database
-	
+	search *search.Search
 }
 
 func (c Context) DB() *database.Database {
 	return c.db
+}
+func (c Context) Search() *search.Search {
+	return c.search
 }
 
 func router(e *echo.Echo) {
 	e.Static("/assets/imgs", "assets/imgs")
 	e.Static("/icons", "icons")
 	e.GET("/", func(c echo.Context) error {
-		return c.Redirect(http.StatusMovedPermanently, e.Reverse("pokemon-list"))
+		return c.Redirect(http.StatusMovedPermanently, e.Reverse("pokemon.list"))
 	})
 	static.Router(e)
 	auth.Router(e)
@@ -43,14 +47,14 @@ func router(e *echo.Echo) {
 	})
 }
 
-func New(db *database.Database) *echo.Echo {
+func New(db *database.Database, search *search.Search) *echo.Echo {
 	e := echo.New()
 	e.HideBanner = true
 
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			cc := &Context{c, db}
+			cc := &Context{c, db, search}
 			return next(cc)
 		}
 	})
