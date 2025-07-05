@@ -119,7 +119,6 @@ func (s *Search) Get(ctx context.Context, text string) (pokemonID string) {
 	resp, err := s.meili.Index(IndexPokemon).SearchWithContext(ctx, text, &meilisearch.SearchRequest{
 		AttributesToHighlight: []string{"*"},
 		Limit: 1,
-		RankingScoreThreshold: 0.75,
 	})
 	if err != nil {
 		slog.WithContext(ctx).Errorf("error searching with meilisearch: %v", err)
