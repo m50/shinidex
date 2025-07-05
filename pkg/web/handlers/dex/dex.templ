@@ -5,6 +5,7 @@ import (
 
 	"github.com/m50/shinidex/pkg/types"
 	"github.com/m50/shinidex/pkg/math"
+	"github.com/m50/shinidex/pkg/views/icons"
 )
 
 templ List(dexes []types.Pokedex) {
@@ -16,54 +17,10 @@ templ List(dexes []types.Pokedex) {
 					Add Living Dex
 				</button>
 			</div>
-			<div class="grid gap-2 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 w-full">
+			<div class="gap-2 flex flex-col">
 				for _, dex := range dexes {
 					if cfg, err := dex.GetConfig(); err == nil {
-						<div
-							hx-get={ string(templ.URL(fmt.Sprintf("/dex/%s", dex.ID))) }
-							hx-push-url="true"
-							hx-target="#app"
-							class="flex flex-col items-center gap-2 rounded-xl
-								bg-slate-700 border border-slate-600 p-2
-								cursor-pointer hover:bg-indigo-700"
-						>
-							<div class="text-3xl text-center">
-								if cfg.Shiny {
-									<span>✨</span>
-								}
-								<br/>
-								<span>{ dex.Name }</span>
-								<br/>
-								if cfg.Shiny {
-									<span>✨</span>
-								}
-							</div>
-							<div class="flex flex-col items-center">
-								<span class="font-bold">Standard Forms</span>
-								<span>{ cfg.Forms.String() }</span>
-							</div>
-							<div class="flex flex-col items-center">
-								<span class="font-bold">Gender Forms</span>
-								<span>{ cfg.GenderForms.String() }</span>
-							</div>
-							<div class="flex flex-col items-center">
-								<span class="font-bold">Regional Forms</span>
-								<span>{ cfg.RegionalForms.String() }</span>
-							</div>
-							<div class="flex flex-col items-center">
-								<span class="font-bold">Gigantamax Forms</span>
-								<span>{ cfg.GMaxForms.String() }</span>
-							</div>
-							<button hx-get={ fmt.Sprintf("/dex/%s/edit", dex.ID) } hx-target="#app" onclick="event.stopPropagation();"
-								hx-push-url="true" class="bg-indigo-500 rounded-xl py-2 px-4 text-xl">
-								Edit
-							</button>
-							<button hx-confirm={ fmt.Sprintf("Are you sure you wish to delete %s?", dex.Name) } 
-								hx-delete={ fmt.Sprintf("/dex/%s", dex.ID) } hx-target="#app" onclick="event.stopPropagation();"
-								hx-push-url="true" class="bg-indigo-500 rounded-xl py-2 px-4 text-xl">
-								Delete
-							</button>
-						</div>
+						@listRow(dex, cfg)
 					}
 				}
 			</div>
@@ -81,6 +38,55 @@ templ Display(pokemonLists []types.PokemonList, dex types.Pokedex) {
 				{{ j++ }}
 			}
 		}
+		</div>
+	</div>
+}
+
+templ listRow(dex types.Pokedex, cfg types.PokedexConfig) {
+	<div hx-get={ string(templ.URL(fmt.Sprintf("/dex/%s", dex.ID))) } 
+		hx-push-url="true" hx-target="#app"
+		class="grid grid-cols-2 md:grid-cols-4 items-center gap-4 w-full rounded-xl
+			bg-slate-700 border border-slate-600 p-4
+			cursor-pointer hover:bg-indigo-700"
+	>
+		<div class="text-2xl items-center col-span-full justify-between flex">
+			<div>
+				{{ icon := "" }}
+				if cfg.Shiny {
+					{{ icon = "✨" }}
+				}
+				<span>{ fmt.Sprintf("%[2]s %[1]s %[2]s", dex.Name, icon) }</span>
+				if cfg.Shiny {
+					<span></span>
+				}
+			</div>
+			<div class="flex items-center justify-end gap-6 px-4">
+				<button hx-get={ fmt.Sprintf("/dex/%s/edit", dex.ID) } hx-target="#app" onclick="event.stopPropagation();"
+					hx-push-url="true" class="fill-white hover:fill-indigo-300 focus:fill-indigo-100 rounded-xl text-xl w-6 h-6">
+					@icons.PenToSquare()
+				</button>
+				<button hx-confirm={ fmt.Sprintf("Are you sure you wish to delete %s?", dex.Name) } hx-delete={
+					fmt.Sprintf("/dex/%s", dex.ID) } hx-target="#app" onclick="event.stopPropagation();" hx-push-url="true"
+					class="fill-white hover:fill-indigo-300 focus:fill-indigo-100 rounded-xl text-xl w-6 h-6">
+					@icons.Trash()
+				</button>
+			</div>
+		</div>
+		<div class="flex flex-col items-center">
+			<span class="font-bold text-center">Standard Forms</span>
+			<span>{ cfg.Forms.String() }</span>
+		</div>
+		<div class="flex flex-col items-center">
+			<span class="font-bold text-center">Gender Forms</span>
+			<span>{ cfg.GenderForms.String() }</span>
+		</div>
+		<div class="flex flex-col items-center">
+			<span class="font-bold text-center">Regional Forms</span>
+			<span>{ cfg.RegionalForms.String() }</span>
+		</div>
+		<div class="flex flex-col items-center">
+			<span class="font-bold text-center">Gigantamax Forms</span>
+			<span>{ cfg.GMaxForms.String() }</span>
 		</div>
 	</div>
 }

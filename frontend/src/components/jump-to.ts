@@ -1,8 +1,9 @@
 import { delay } from "../functions"
 
-const pathRegexp = /\/dex\/(?!new)\w+|\/pokemon/
+const pathRegexp = /\/dex\/(?!new|\w+\/edit)\w+|\/pokemon/
 
 export default () => {
+    console.log(pathRegexp.test(document.location.href))
     const jumpTo = (document.getElementById('jump-to') as HTMLInputElement)
     const app = document.getElementById('app')
     if (!jumpTo) {

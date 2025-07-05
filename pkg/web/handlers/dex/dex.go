@@ -75,6 +75,7 @@ func create(c echo.Context) error {
 }
 
 func edit(c echo.Context) error {
+	c.Set("rendersPokemon", false)
 	ctx := context.FromEcho(c)
 	id := c.Param("dex")
 	db := c.(database.DBContext).DB().Pokedexes()
