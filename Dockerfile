@@ -6,17 +6,12 @@ COPY package.json bun.lockb ./
 RUN bun install --frozen-lockfile
 
 COPY frontend/ ./frontend/
-COPY pkg/ ./pkg
 
 RUN bun run build
 
 FROM golang:1.24.3 AS go-builder
 
 WORKDIR /app
-
-RUN apt-get update \
-    && apt-get install -y git gcc \
-    && rm -rf /var/lib/apt/lists/*
 
 COPY go.mod go.sum ./
 RUN go mod download 
