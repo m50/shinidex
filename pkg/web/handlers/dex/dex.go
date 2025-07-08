@@ -84,12 +84,7 @@ func edit(c echo.Context) error {
 		return err
 	}
 
-	cfg, err := dex.GetConfig()
-	if err != nil {
-		return err
-	}
-
-	return views.RenderView(c, http.StatusOK, EditDex(dex, cfg))
+	return views.RenderView(c, http.StatusOK, EditDex(dex))
 }
 
 func update(c echo.Context) error {
@@ -113,14 +108,12 @@ func update(c echo.Context) error {
 		return err
 	}
 	dex.Name = f.Name
-	if err = dex.UpdateConfig(types.PokedexConfig{
+	dex.Config = types.PokedexConfig{
 		Shiny:         form.ParseBool(f.Shiny),
 		Forms:         f.Forms,
 		GenderForms:   f.GenderForms,
 		RegionalForms: f.RegionalForms,
 		GMaxForms:     f.GMaxForms,
-	}); err != nil {
-		return err
 	}
 
 	if err = db.Update(ctx, dex); err != nil {

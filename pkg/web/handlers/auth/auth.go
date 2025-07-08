@@ -54,6 +54,7 @@ func register(c echo.Context) error {
 		return err
 	}
 	if f.Honeypot != "" {
+		slog.WithContext(ctx).Warn("caught someone filling in honeypot, likely a bot attempting to register", f)
 		return c.Redirect(http.StatusMovedPermanently, "/")
 	}
 	if f.Password != f.ConfirmPassword {
@@ -89,6 +90,7 @@ func register(c echo.Context) error {
 }
 
 func loginForm(c echo.Context) error {
+	slog.WithContext(context.FromEcho(c)).Debugf("Disable Password: %v", viper.GetBool(oidc.KeyDisablePassword))
 	if viper.GetBool(oidc.KeyDisablePassword) {
 		return c.Redirect(http.StatusMovedPermanently, c.Echo().Reverse(oidc.PathNameOIDCLogin))
 	}
@@ -106,6 +108,14 @@ func login(c echo.Context) error {
 	} else if errors.Is(err, sql.ErrNoRows) {
 		return views.RenderView(c, http.StatusForbidden, LoginForm(c),
 			views.Error(fmt.Errorf("no account found for %s", email)))
+	}
+	if c.FormValue("password") == "" || user.Password == "" {
+		return views.RenderView(c, http.StatusForbidden, LoginForm(c), 
+			views.Error(errors.New("no password")))
+	}
+	if user.Managed {
+		return views.RenderView(c, http.StatusForbidden, LoginForm(c),
+			views.Error(errors.New("account is managed by oidc")))
 	}
 
 	if err := passwords.ComparePasswords(user.Password, c.FormValue("password")); err != nil {

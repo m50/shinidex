@@ -48,8 +48,8 @@ func (db UserDB) FindOrMake(ctx context.Context, user types.User) (types.User, e
 
 func (db UserDB) Insert(ctx context.Context, user types.User) (string, error) {
 	query := `
-	INSERT INTO users (id, email, password, created, updated)
-	VALUES (:id, :email, :password, :created, :updated);
+	INSERT INTO users (id, email, password, managed, created, updated)
+	VALUES (:id, :email, :password, :managed, :created, :updated);
 	`
 	user.Created = time.Now()
 	user.Updated = time.Now()
@@ -63,6 +63,7 @@ func (db UserDB) Update(ctx context.Context, user types.User) error {
 	UPDATE users
 	SET email = :email,
 		password = :password,
+		managed = :managed,
 		created = :created,
 		updated = :updated
 	WHERE id = :id;

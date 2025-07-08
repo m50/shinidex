@@ -27,7 +27,7 @@ func AuthzMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		dexID := c.Param("dex")
-		if dexID == "" {
+		if dexID == "" || c.Request().Method == "GET" {
 			return next(c)
 		}
 		db := c.(database.DBContext).DB()

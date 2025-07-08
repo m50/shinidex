@@ -1,7 +1,9 @@
 package types
 
 import (
+	"database/sql/driver"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"slices"
@@ -15,6 +17,7 @@ type User struct {
 	ID       string
 	Email    string
 	Password string
+	Managed  bool // Whether the user is managed by OIDC
 	Created  time.Time
 	Updated  time.Time
 }
@@ -190,21 +193,21 @@ type Pokedex struct {
 	ID      string
 	Name    string
 	OwnerID string `db:"owner_id"`
-	Config  string
-	config  PokedexConfig
+	Config  PokedexConfig
+	// config  PokedexConfig
 	Created time.Time
 	Updated time.Time
 }
 
 func NewPokedex(ownerID, name string, config PokedexConfig) (Pokedex, error) {
-	c, err := json.Marshal(config)
-	if err != nil {
-		return Pokedex{}, err
-	}
+	// c, err := json.Marshal(config)
+	// if err != nil {
+	// 	return Pokedex{}, err
+	// }
 	return Pokedex{
 		OwnerID: ownerID,
 		Name:    name,
-		Config:  string(c),
+		Config:  config,
 	}, nil
 }
 
@@ -258,24 +261,56 @@ type PokedexConfig struct {
 	set           bool
 }
 
-func (p Pokedex) GetConfig() (PokedexConfig, error) {
-	var err error
-	if !p.config.set {
-		err = json.Unmarshal([]byte(p.Config), &p.config)
-		if err == nil {
-			p.config.set = true
-		}
-	}
-	return p.config, err
-}
-func (p *Pokedex) UpdateConfig(config PokedexConfig) error {
-	c, err := json.Marshal(config)
+// Value implements the driver.Valuer interface
+func (v PokedexConfig) Value() (driver.Value, error) {
+	res, err := json.Marshal(v)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	p.Config = string(c)
-	return nil
+
+	return res, nil
 }
+
+// Scan implements the sql.Scanner interface
+func (v *PokedexConfig) Scan(value interface{}) error {
+	var err error
+
+	switch t := value.(type) {
+	case []byte:
+		if len(t) == 0 {
+			return nil
+		}
+		err = json.Unmarshal(t, &v)
+	case string:
+		if len(t) == 0 {
+			return nil
+		}
+		err = json.Unmarshal([]byte(t), &v)
+	default:
+		err = errors.New("json: unsupported column type")
+	}
+
+	return err
+}
+
+// func (p Pokedex) GetConfig() (PokedexConfig, error) {
+// 	var err error
+// 	if !p.config.set {
+// 		err = json.Unmarshal([]byte(p.Config), &p.config)
+// 		if err == nil {
+// 			p.config.set = true
+// 		}
+// 	}
+// 	return p.config, err
+// }
+// func (p *Pokedex) UpdateConfig(config PokedexConfig) error {
+// 	c, err := json.Marshal(config)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	p.Config = string(c)
+// 	return nil
+// }
 
 type PokedexEntry struct {
 	PokedexID string `db:"pokedex_id"`

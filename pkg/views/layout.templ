@@ -5,6 +5,7 @@ import "github.com/m50/shinidex/pkg/types"
 import "github.com/m50/shinidex/pkg/utils"
 import "github.com/m50/shinidex/pkg/web/static"
 import "github.com/spf13/viper"
+import "github.com/m50/shinidex/pkg/oidc"
 
 templ BaseLayout(authedUser *types.User, rendersPkmn bool) {
 	<!DOCTYPE html>
@@ -85,13 +86,15 @@ templ links(authedUser *types.User) {
 	<a href="/pokemon" class="hover:text-indigo-400 flex-none">Pokémon</a>
 	if authedUser != nil {
 		<a href="/dex" class="hover:text-indigo-400 flex-none cursor-pointer">Pokédexes</a>
-		<a href={ templ.URL(fmt.Sprintf("/account/%s", authedUser.ID)) }
-			class="hover:text-indigo-400 flex-none cursor-pointer">Account</a>
+		if !authedUser.Managed {
+			<a href={ templ.URL(fmt.Sprintf("/account/%s", authedUser.ID)) }
+				class="hover:text-indigo-400 flex-none cursor-pointer">Account</a>
+		}
 		<a hx-push-url="true" hx-target="#app" hx-post="/auth/logout"
 			class="hover:text-indigo-400 flex-none cursor-pointer">Logout</a>
 	} else {
 		<a href="/auth/login" class="hover:text-indigo-400 flex-none cursor-pointer">Login</a>
-		if !viper.GetBool("auth.disable-registration") {
+		if !viper.GetBool("auth.disable-registration") && !viper.GetBool(oidc.KeyDisablePassword) {
 			<a href="/auth/register" class="hover:text-indigo-400 flex-none cursor-pointer">Register</a>
 		}
 	}

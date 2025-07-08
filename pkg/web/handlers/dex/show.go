@@ -28,10 +28,6 @@ func show(c echo.Context) error {
 	if err != nil {
 		return views.RenderError(c, err)
 	}
-	cfg, err := dex.GetConfig()
-	if err != nil {
-		return views.RenderError(c, err)
-	}
 	pokemon, err := db.Pokemon().GetAllAsSeparateForms(ctx)
 	if err != nil {
 		return views.RenderError(c, err)
@@ -46,22 +42,22 @@ func show(c echo.Context) error {
 		if !pkmn.Form {
 			return false
 		}
-		return (!cfg.Forms.AfterBaseForm() && pkmn.IsStandardForm()) ||
-			(!cfg.GMaxForms.AfterBaseForm() && pkmn.IsGMax()) ||
-			(!cfg.RegionalForms.AfterBaseForm() && pkmn.IsRegional()) ||
-			(!cfg.GenderForms.AfterBaseForm() && pkmn.IsFemale())
+		return (!dex.Config.Forms.AfterBaseForm() && pkmn.IsStandardForm()) ||
+			(!dex.Config.GMaxForms.AfterBaseForm() && pkmn.IsGMax()) ||
+			(!dex.Config.RegionalForms.AfterBaseForm() && pkmn.IsRegional()) ||
+			(!dex.Config.GenderForms.AfterBaseForm() && pkmn.IsFemale())
 	})
 	afterPokemon := types.PokemonList{}
-	if cfg.Forms.Separate() {
+	if dex.Config.Forms.Separate() {
 		afterPokemon = append(afterPokemon, pokemon.StandardForms()...)
 	}
-	if cfg.GMaxForms.Separate() {
+	if dex.Config.GMaxForms.Separate() {
 		afterPokemon = append(afterPokemon, pokemon.GMax()...)
 	}
-	if cfg.GenderForms.Separate() {
+	if dex.Config.GenderForms.Separate() {
 		afterPokemon = append(afterPokemon, pokemon.Female()...)
 	}
-	if cfg.RegionalForms.Separate() {
+	if dex.Config.RegionalForms.Separate() {
 		afterPokemon = append(afterPokemon, pokemon.Regional()...)
 	}
 	slices.SortStableFunc(afterPokemon, func(pkmnA, pkmnB types.Pokemon) int {

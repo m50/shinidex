@@ -18,6 +18,7 @@ import (
 	"github.com/m50/shinidex/pkg/types"
 	"github.com/m50/shinidex/pkg/views"
 	"github.com/m50/shinidex/pkg/web/session"
+	"github.com/spf13/viper"
 )
 
 const (
@@ -25,11 +26,11 @@ const (
 	cookieNonce = "oidcnonce"
 )
 
-func oidcRouter(e *echo.Group) {
-	if oidc.Provider != nil {
+func oidcRouter(g *echo.Group) {
+	if viper.GetString(oidc.KeyClientID) == "" {
 		return
 	}
-	group := e.Group("/oidc")
+	group := g.Group("/oidc")
 
 	group.GET("/login", oidcLogin).Name = oidc.PathNameOIDCLogin
 	group.GET("/callback", oidcRedirect).Name = oidc.PathNameOIDCCallback
@@ -126,8 +127,15 @@ func oidcRedirect(c echo.Context) error {
 	}
 	db := c.(database.DBContext).DB()
 	user, err := db.Users().FindOrMake(ctx, types.User{
-		Email: claims.Email,
+		Email:   claims.Email,
+		Managed: true,
 	})
+	if !user.Managed {
+		user.Managed = true
+		if err = db.Users().Update(ctx, user); err != nil {
+			slog.WithContext(ctx).Error(err)
+		}
+	}
 	if err != nil {
 		log.Error(err)
 		return views.RenderView(c, http.StatusForbidden, LoginForm(c),

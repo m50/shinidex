@@ -7,10 +7,10 @@ import (
 )
 
 templ New() {
-	@EditDex(types.Pokedex{}, types.PokedexConfig{})
+	@EditDex(types.Pokedex{})
 }
 
-templ EditDex(dex types.Pokedex, cfg types.PokedexConfig) {
+templ EditDex(dex types.Pokedex) {
 	<div class="flex justify-center p-4 h-full">
 		<form
 			if dex.Name == "" {
@@ -49,16 +49,16 @@ templ EditDex(dex types.Pokedex, cfg types.PokedexConfig) {
 					id="shiny"
 					class="rounded focus:ring-blue-500 focus:border-blue-500 w-4 h-4
 						text-indigo-600 bg-slate-700 border border-slate-600"
-					if cfg.Shiny {
+					if dex.Config.Shiny {
 						checked
 					}
 				/>
 			</div>
-			@formLocationSelector("Forms", "forms", cfg.Forms)
-			@formLocationSelector("Gender Forms", "gender", cfg.GenderForms)
-			@formLocationSelector("Regional Forms", "regional", cfg.RegionalForms)	
-			@formLocationSelector("Gigantamax Forms", "gmax", cfg.GMaxForms)	
-			<button type="submit" class="bg-indigo-500 rounded-xl py-2 px-4 flex-none text-xl mt-4">
+			@formLocationSelector("Forms", "forms", dex.Config.Forms)
+			@formLocationSelector("Gender Forms", "gender", dex.Config.GenderForms)
+			@formLocationSelector("Regional Forms", "regional", dex.Config.RegionalForms)	
+			@formLocationSelector("Gigantamax Forms", "gmax", dex.Config.GMaxForms)	
+			<button type="submit" class="bg-indigo-500 rounded-xl py-2 px-4 flex-none text-xl mt-4 cursor-pointer hover:bg-indigo-600">
 				if dex.Name == "" {
 					Create
 				} else {

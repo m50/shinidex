@@ -43,20 +43,18 @@ func pkmnClasses(shiny bool, pkmn types.Pokemon) string {
 }
 
 templ Pokemon(dex types.Pokedex, pkmn types.Pokemon) {
-	if c, err := dex.GetConfig(); err == nil {
-		<div
-			class="w-14 h-14 text-slate-800 hover:bg-indigo-300 flex justify-center items-center rounded-xl"
-			title={ pkmn.Name }
-			id={ pkmn.ID }
-			if !pkmn.Caught && ((c.Shiny && !pkmn.ShinyLocked) || !c.Shiny) {
-				hx-patch={ fmt.Sprintf("/dex/%s/pkmn/%s", dex.ID, pkmn.ID) }
-			}
-			if pkmn.Caught {
-				hx-delete={ fmt.Sprintf("/dex/%s/pkmn/%s", dex.ID, pkmn.ID) }
-			}
-			hx-swap="outerHTML"
-		>
-			<img class={ pkmnClasses(c.Shiny, pkmn) } src={ pkmn.GetImageURL(c.Shiny) } alt={ pkmn.Name } />
-		</div>
-	}
+	<div
+		class="w-14 h-14 text-slate-800 hover:bg-indigo-300 flex justify-center items-center rounded-xl cursor-pointer"
+		title={ pkmn.Name }
+		id={ pkmn.ID }
+		if !pkmn.Caught && ((dex.Config.Shiny && !pkmn.ShinyLocked) || !dex.Config.Shiny) {
+			hx-patch={ fmt.Sprintf("/dex/%s/pkmn/%s", dex.ID, pkmn.ID) }
+		}
+		if pkmn.Caught {
+			hx-delete={ fmt.Sprintf("/dex/%s/pkmn/%s", dex.ID, pkmn.ID) }
+		}
+		hx-swap="outerHTML"
+	>
+		<img class={ pkmnClasses(dex.Config.Shiny, pkmn) } src={ pkmn.GetImageURL(dex.Config.Shiny) } alt={ pkmn.Name } />
+	</div>
 }
