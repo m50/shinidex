@@ -6,6 +6,7 @@ COPY package.json bun.lockb ./
 RUN bun install --frozen-lockfile
 
 COPY frontend/ ./frontend/
+COPY pkg/ ./pkg
 
 RUN bun run build
 
